@@ -1,9 +1,11 @@
 # Modelo Modular de UGV Terrestre Pesado Dual en SysML v2
 
+
 Este repositorio contiene la arquitectura formal de ingeniería de sistemas (MBSE) para un **UGV (Unmanned Ground Vehicle) Terrestre Pesado Multipropósito de uso Dual (Civil-Militar)** desarrollado según la especificación **OMG SysML v2** y adaptado a las prescripciones técnicas de un pliego real del **CDTI**.
 
 El modelo se centra en la plataforma de ruedas (Lote 1: tracción 4x4, 6x6 u 8x8) completo junto con sus puestos de control, dron cenital y módulos de misión.
 
+🌐 **Panel para la gestión del proyecto y Reparto de Tareas (GitHub Pages)**: [**https://juanuniovi.github.io/UGV-sysml-/**](https://juanuniovi.github.io/UGV-sysml-/)  *(sincronizado en tiempo real con los GitHub Issues para coordinación)*
 
 ## 1. Arquitectura general del Sistema
 

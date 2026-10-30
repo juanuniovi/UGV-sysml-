@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UGV SysML — Control del Proyecto</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Navegación Superior Apple (Frosted Glass) -->
+  <nav class="apple-nav sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
+      
+      <!-- Marca / Logo -->
+      <div class="flex items-center space-x-3 shrink-0">
+        <a href="#/panel" class="flex items-center space-x-2 text-[#1d1d1f] hover:opacity-80 transition">
+          <span class="w-7 h-7 rounded-lg bg-[#1d1d1f] text-white flex items-center justify-center text-xs font-semibold">
+            Sys
+          </span>
+          <span class="font-medium text-sm tracking-tight hidden sm:inline">UGV SysML v2</span>
+        </a>
+      </div>
+
+      <!-- Segmented Control Central Estilo Apple -->
+      <div class="apple-segmented-control">
+        <button id="nav-btn-panel" class="active">
+          Panel
+        </button>
+        <button id="nav-btn-archivos">
+          Archivos
+        </button>
+        <button id="nav-btn-tareas">
+          Tareas
+        </button>
+      </div>
+
+      <!-- Acciones Derecha -->
+      <div class="flex items-center space-x-2.5 shrink-0">
+        <button id="btn-recargar" class="apple-pill bg-white border border-[#00000014] text-[#1d1d1f] hover:bg-[#f5f5f7] transition flex items-center gap-1.5 shadow-sm text-xs font-medium" title="Refrescar datos">
+          <svg class="w-3.5 h-3.5 text-[#86868b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span class="hidden sm:inline">Actualizar</span>
+        </button>
+
+        <a href="https://github.com/juanuniovi/UGV-sysml-" target="_blank" rel="noopener noreferrer" class="apple-pill bg-[#1d1d1f] text-white hover:bg-[#2d2d2f] transition flex items-center gap-1 text-xs font-medium">
+          GitHub
+          <svg class="w-3 h-3 text-[#86868b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <main class="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
+
+    <!-- Indicador de Carga -->
+    <div id="loader" class="text-center py-20">
+      <div class="inline-block w-6 h-6 border-2 border-[#1d1d1f] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs text-[#86868b] mt-3">Cargando datos del repositorio...</p>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN 1: PANEL DE CONTROL GENERAL                      -->
+    <!-- ======================================================== -->
+    <div id="vista-general" class="view-container view-hidden">
+      
+      <div class="mb-8">
+        <h1 class="text-3xl font-semibold tracking-tight text-[#1d1d1f]">
+          Panel de Control
+        </h1>
+        <p class="text-sm text-[#86868b] mt-1">
+          Resumen de actividad y estado de trabajo de los integrantes del equipo.
+        </p>
+      </div>
+
+      <!-- Métricas Clave Apple -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div class="apple-card p-5">
+          <span class="text-xs font-medium text-[#86868b]">Commits totales</span>
+          <div id="stat-commits" class="text-3xl font-semibold text-[#1d1d1f] mt-1 tracking-tight">-</div>
+          <span class="text-[11px] text-[#86868b] mt-1 block">Aportaciones registradas</span>
+        </div>
+        <div class="apple-card p-5">
+          <span class="text-xs font-medium text-[#86868b]">Ramas activas</span>
+          <div id="stat-ramas" class="text-3xl font-semibold text-[#1d1d1f] mt-1 tracking-tight">-</div>
+          <span class="text-[11px] text-[#86868b] mt-1 block">En el repositorio</span>
+        </div>
+        <div class="apple-card p-5">
+          <span class="text-xs font-medium text-[#86868b]">Integrantes</span>
+          <div id="stat-miembros" class="text-3xl font-semibold text-[#1d1d1f] mt-1 tracking-tight">-</div>
+          <span class="text-[11px] text-[#86868b] mt-1 block">Equipo de desarrollo</span>
+        </div>
+        <div class="apple-card p-5">
+          <span class="text-xs font-medium text-[#86868b]">Pull Requests</span>
+          <div id="stat-prs" class="text-3xl font-semibold text-[#1d1d1f] mt-1 tracking-tight">-</div>
+          <span class="text-[11px] text-[#86868b] mt-1 block">Revisiones e integraciones</span>
+        </div>
+      </div>
+
+      <!-- Sección de Integrantes -->
+      <div class="mb-12">
+        <div class="flex items-baseline justify-between mb-4">
+          <div>
+            <h2 class="text-xl font-semibold text-[#1d1d1f] tracking-tight">Integrantes del Proyecto</h2>
+            <p class="text-xs text-[#86868b] mt-0.5">Selecciona a un compañero para ver su panel individual y tareas en curso.</p>
+          </div>
+          <span class="text-xs text-[#86868b] font-medium hidden sm:inline">5 miembros activos</span>
+        </div>
+
+        <div id="grid-miembros" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+
+      <!-- Actividad Reciente Global -->
+      <div>
+        <div class="mb-3">
+          <h2 class="text-lg font-semibold text-[#1d1d1f] tracking-tight">Actividad Reciente del Repositorio</h2>
+          <p class="text-xs text-[#86868b]">Últimos cambios consolidados en el proyecto.</p>
+        </div>
+
+        <div class="apple-card divide-y divide-[#0000000d] overflow-hidden" id="timeline-global">
+          <!-- Commits globales -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN 2: PERFIL INDIVIDUAL DEL INTEGRANTE             -->
+    <!-- ======================================================== -->
+    <div id="vista-miembro" class="view-container view-hidden">
+      
+      <div class="mb-6">
+        <button id="btn-volver" class="inline-flex items-center text-sm font-medium text-[#0071e3] hover:text-[#0077ed] transition group">
+          <svg class="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Todos los integrantes
+        </button>
+      </div>
+
+      <div class="apple-card p-7 sm:p-9 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div class="flex items-center space-x-5">
+            <img id="perfil-avatar" src="" alt="" class="w-20 h-20 rounded-2xl border border-[#00000014] object-cover bg-[#f5f5f7]">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h1 id="perfil-nombre" class="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight"></h1>
+                <span id="perfil-rol" class="apple-pill"></span>
+              </div>
+              <p id="perfil-github" class="text-xs text-[#86868b] font-mono mt-1"></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-6 border-t sm:border-t-0 sm:border-l border-[#0000000d] pt-4 sm:pt-0 sm:pl-8">
+            <div>
+              <span class="text-xs text-[#86868b] block font-medium">Commits</span>
+              <span id="perfil-commits" class="text-2xl font-semibold text-[#1d1d1f] tracking-tight">0</span>
+            </div>
+            <div>
+              <span class="text-xs text-[#86868b] block font-medium">Rama habitual</span>
+              <span id="perfil-rama-pill" class="text-xs font-mono font-medium text-[#0071e3] bg-[#0071e30f] px-2.5 py-1 rounded-md mt-0.5 inline-block">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold text-[#1d1d1f] tracking-tight flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#34c759] pulse-indicator"></span>
+            ¿Qué está haciendo ahora?
+          </h2>
+          <span class="text-xs text-[#86868b]">Estado en tiempo real</span>
+        </div>
+
+        <div id="perfil-en-curso" class="apple-card p-6">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+
+      <div>
+        <div class="mb-3">
+          <h2 class="text-lg font-semibold text-[#1d1d1f] tracking-tight">Historial de Aportaciones</h2>
+          <p class="text-xs text-[#86868b]">Línea cronológica de commits y contribuciones en el repositorio.</p>
+        </div>
+
+        <div id="perfil-historial" class="apple-card divide-y divide-[#0000000d] overflow-hidden">
+          <!-- Commits del miembro -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN 3: EXPLORADOR DE ARCHIVOS Y AUTORÍA              -->
+    <!-- ======================================================== -->
+    <div id="vista-archivos" class="view-container view-hidden">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight text-[#1d1d1f]">
+            Explorador de Archivos
+          </h1>
+          <p class="text-sm text-[#86868b] mt-1">
+            Estructura modular del repositorio SysML v2 con autoría de cada subsistema.
+          </p>
+        </div>
+
+        <!-- Filtros de categoría -->
+        <div class="flex items-center gap-1.5 bg-[#0000000a] p-1 rounded-xl text-xs font-medium self-start sm:self-auto">
+          <button id="filtro-arch-todos" class="px-3 py-1 rounded-lg bg-white shadow-sm font-semibold text-[#1d1d1f] transition">Todos</button>
+          <button id="filtro-arch-modelos" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">Modelos/</button>
+          <button id="filtro-arch-openspec" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">openspec/</button>
+          <button id="filtro-arch-docs" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">docs/</button>
+        </div>
+      </div>
+
+      <!-- Buscador rápido de archivos -->
+      <div class="mb-5">
+        <div class="relative">
+          <input type="text" id="busqueda-archivos" placeholder="Filtrar archivo (ej. bateria, chasis, vistas)..." class="w-full bg-white border border-[#00000014] rounded-xl px-4 py-2.5 pl-10 text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition shadow-sm">
+          <svg class="w-4 h-4 text-[#86868b] absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Lista de Archivos -->
+      <div class="apple-card divide-y divide-[#0000000d] overflow-hidden" id="lista-archivos-contenedor">
+        <!-- Renderizado dinámico de archivos -->
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SECCIÓN 4: GESTOR DE TAREAS (TO-DO / RECORDATORIOS)       -->
+    <!-- ======================================================== -->
+    <div id="vista-tareas" class="view-container view-hidden">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight text-[#1d1d1f]">
+            Planificador de Tareas
+          </h1>
+          <p class="text-sm text-[#86868b] mt-1">
+            Organización del trabajo, requisitos por implementar y asignaciones del equipo.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <!-- Botón de estado de sincronización y ajustes de Token -->
+          <button id="btn-sync-ajustes" class="apple-pill bg-white border border-[#00000014] text-xs font-medium flex items-center gap-2 hover:bg-[#f5f5f7] transition shadow-sm py-1.5 px-3" title="Estado de sincronización y configuración de token">
+            <span id="sync-indicator-dot" class="w-2 h-2 rounded-full bg-[#34c759]"></span>
+            <span id="sync-status-texto">GitHub Issues</span>
+            <svg class="w-3.5 h-3.5 text-[#86868b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </button>
+
+          <!-- Filtros de estado -->
+          <div class="flex items-center gap-1.5 bg-[#0000000a] p-1 rounded-xl text-xs font-medium">
+            <button id="filtro-tarea-todas" class="px-3 py-1 rounded-lg bg-white shadow-sm font-semibold text-[#1d1d1f] transition">Todas</button>
+            <button id="filtro-tarea-pendientes" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">Pendientes</button>
+            <button id="filtro-tarea-completadas" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">Completadas</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner explicativo de sincronización multi-dispositivo -->
+      <div id="banner-sync-info" class="mb-5 p-3.5 bg-blue-50/70 border border-blue-100/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#0071e3]">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-4 h-4 shrink-0 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span id="banner-sync-texto"><strong>Sincronización remota:</strong> Las tareas se consultan desde GitHub Issues para que cualquier compañero las vea al abrir la web desde su ordenador.</span>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button id="btn-banner-forzar-sync" class="text-xs font-semibold text-[#0071e3] hover:underline">
+            Refrescar ahora ↺
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjeta: Añadir Nueva Tarea (Apple Style) -->
+      <div class="apple-card p-5 mb-6">
+        <form id="form-nueva-tarea" class="space-y-3">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="input-tarea-texto" required placeholder="Escribe una nueva tarea del proyecto..." class="flex-1 bg-[#f5f5f7] border border-[#0000000d] rounded-xl px-4 py-2.5 text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition">
+            
+            <select id="select-tarea-miembro" class="bg-[#f5f5f7] border border-[#0000000d] rounded-xl px-3 py-2.5 text-sm text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition font-medium">
+              <option value="pelayo">Asignar a: Pelayo</option>
+              <option value="jose">Asignar a: José</option>
+              <option value="juan">Asignar a: Juan (Profesor)</option>
+              <option value="eloy">Asignar a: Eloy</option>
+              <option value="cesar">Asignar a: César</option>
+            </select>
+
+            <button type="submit" class="apple-pill bg-[#0071e3] text-white hover:bg-[#0077ed] transition font-semibold text-xs px-5 py-2.5 shadow-sm shrink-0 flex items-center justify-center gap-1.5">
+              <span>Añadir Tarea</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lista de Tareas -->
+      <div class="apple-card divide-y divide-[#0000000d] overflow-hidden" id="lista-tareas-contenedor">
+        <!-- Renderizado dinámico de tareas con checkboxes circulares -->
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: AJUSTES DE SINCRONIZACIÓN CON GITHUB ISSUES       -->
+  <!-- ======================================================== -->
+  <div id="modal-sync-ajustes" class="apple-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="apple-modal-content apple-card bg-white max-w-lg w-full p-6 sm:p-7 shadow-2xl relative">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#0071e30f] text-[#0071e3] flex items-center justify-center font-bold text-sm">
+            GH
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-[#1d1d1f] tracking-tight">Sincronización con GitHub</h3>
+            <p class="text-xs text-[#86868b]">Persistencia compartida para todo el equipo</p>
+          </div>
+        </div>
+        <button id="btn-cerrar-modal-sync" class="text-[#86868b] hover:text-[#1d1d1f] p-1.5 rounded-lg hover:bg-[#f5f5f7] transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs text-[#1d1d1f] leading-relaxed">
+        <div class="bg-[#f5f5f7] p-3.5 rounded-xl border border-[#0000000d]">
+          <p class="font-medium text-[#1d1d1f]">¿Cómo funciona?</p>
+          <p class="text-[#86868b] mt-1">
+            Las tareas del proyecto se leen en directo desde los <strong>GitHub Issues</strong> del repositorio (<code class="font-mono text-[#0071e3]">juanuniovi/UGV-sysml-</code>). De este modo, cualquier tarea asignada aparece automáticamente en el navegador de cualquier compañero al abrir la web.
+          </p>
+        </div>
+
+        <div>
+          <label for="input-github-token" class="block font-medium text-xs text-[#1d1d1f] mb-1">
+            Token de Acceso Personal (PAT) de GitHub <span class="text-[#86868b] font-normal">(Opcional)</span>
+          </label>
+          <input type="password" id="input-github-token" placeholder="ghp_xxxxxxxxxxxx o github_pat_xxxx" class="w-full bg-[#f5f5f7] border border-[#00000014] rounded-xl px-3.5 py-2 text-xs font-mono text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition">
+          <p class="text-[11px] text-[#86868b] mt-1.5">
+            Si añades tu token, podrás <strong>crear y cerrar tareas con un solo clic</strong> desde la web. Se almacena únicamente en tu navegador (<code class="font-mono">localStorage</code>), nunca en el repositorio.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] pt-1 gap-2">
+          <div class="flex items-center gap-3">
+            <a href="GUIA_TOKEN_GITHUB.md" target="_blank" rel="noopener noreferrer" class="text-[#0071e3] hover:underline font-medium inline-flex items-center gap-1">
+              ¿Qué es este token? Leer guía explicativa ↗
+            </a>
+            <span class="text-[#86868b]">•</span>
+            <a href="https://github.com/settings/tokens/new?scopes=repo&description=UGV-SysML-Dashboard" target="_blank" rel="noopener noreferrer" class="text-[#86868b] hover:text-[#0071e3] hover:underline font-medium inline-flex items-center gap-1">
+              Generar en GitHub ↗
+            </a>
+          </div>
+          <span id="badge-token-status" class="text-[#86868b] font-mono">Sin token (Modo lectura)</span>
+        </div>
+
+        <div class="pt-4 border-t border-[#0000000d] flex items-center justify-between gap-3">
+          <button id="btn-eliminar-token" class="text-xs text-red-500 hover:text-red-600 font-medium hidden">
+            Eliminar token
+          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button id="btn-forzar-recarga-modal" class="apple-pill bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] transition text-xs font-medium px-4 py-2">
+              Forzar recarga
+            </button>
+            <button id="btn-guardar-token" class="apple-pill bg-[#0071e3] text-white hover:bg-[#0077ed] transition text-xs font-semibold px-4 py-2 shadow-sm">
+              Guardar configuración
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: OPCIONES AL CREAR TAREA SIN TOKEN                 -->
+  <!-- ======================================================== -->
+  <div id="modal-crear-opciones" class="apple-modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="apple-modal-content apple-card bg-white max-w-md w-full p-6 shadow-2xl relative">
+      <h3 class="text-base font-semibold text-[#1d1d1f] tracking-tight mb-2">Publicar tarea en el equipo</h3>
+      <p id="modal-crear-resumen" class="text-xs text-[#86868b] mb-4 leading-relaxed"></p>
+
+      <div class="space-y-2.5">
+        <button id="btn-modal-crear-github" class="w-full apple-card p-3 text-left hover:border-[#0071e3] transition flex items-center justify-between group">
+          <div>
+            <span class="text-xs font-semibold text-[#0071e3] block group-hover:underline">Publicar en GitHub Issues (Recomendado)</span>
+            <span class="text-[11px] text-[#86868b] block mt-0.5">Abre GitHub con los datos rellenos para confirmarlo en 1 segundo sin token.</span>
+          </div>
+          <svg class="w-4 h-4 text-[#0071e3] shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </button>
+
+        <button id="btn-modal-configurar-token" class="w-full apple-card p-3 text-left hover:border-[#1d1d1f] transition flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold text-[#1d1d1f] block">Configurar Token Personal de GitHub</span>
+            <span class="text-[11px] text-[#86868b] block mt-0.5">Para publicar siempre en 1 clic directamente desde el panel sin abrir pestañas.</span>
+          </div>
+          <svg class="w-4 h-4 text-[#86868b] shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <button id="btn-modal-guardar-local" class="w-full text-center py-2 text-xs text-[#86868b] hover:text-[#1d1d1f] transition">
+          Guardar solo en este ordenador (Modo local)
+        </button>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-[#0000000d] text-right">
+        <button id="btn-cerrar-modal-crear" class="text-xs text-[#86868b] hover:text-[#1d1d1f] font-medium">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificaciones Flotante Apple -->
+  <div id="apple-toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <footer class="border-t border-[#0000000d] py-8 text-center text-xs text-[#86868b] bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+      <p>Proyecto UGV SysML v2 • Desarrollo con Git y OpenSpec</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
