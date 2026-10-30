@@ -45,7 +45,88 @@ Modelos/
 
 ---
 
-## 3. Topología de Conexiones (Internal Block Diagram - IBD)
+## 3. Arquitectura Gráfica del Sistema
+
+A continuación se muestra el diagrama de arquitectura física y funcional del UGV pesando sus interconexiones de **Información/Datos**, **Potencia/Energía** y **Sustentación Mecánica**:
+
+![Arquitectura de Componentes y Conexiones del Sistema UGV](Vistas%20graficas/diagrama_componentes_ugv.svg)
+
+> 💡 **Visor interactivo con filtros de capas**: Puedes abrir el archivo [`Vistas graficas/index.html`](Vistas%20graficas/index.html) directamente en el navegador para activar/desactivar dinámicamente cada tipo de flujo.
+
+### Diagrama de Bloques y Conexiones (Mermaid)
+
+```mermaid
+flowchart TB
+    %% ==========================================
+    %% ZONA 1: ELEMENTOS DE CONTROL EXTERNO Y APOYO
+    %% ==========================================
+    subgraph EXTERNO ["ELEMENTOS DE CONTROL EXTERNO Y APOYO (Fuera del Vehículo)"]
+        PMP["<b>06. Puesto Mando Portable (PMP)</b><br/>• Estación Rugerizada Linux<br/>• Supervisión Táctica BLOS"]
+        CPT["<b>06. Consola Portable (CPT)</b><br/>• Telemando Ligero de Mano<br/>• Control Visual Cercano LOS"]
+        UAV["<b>07. UAV Apoyo Cenital</b><br/>• Dron Cenital y Relé RF<br/>• Recarga en Techo UGV"]
+    end
+
+    %% ==========================================
+    %% ZONA 2: PLATAFORMA UGV PESADA (RUEDAS)
+    %% ==========================================
+    subgraph PLATAFORMA ["PLATAFORMA UGV PESADA (Vehículo Base a Ruedas)"]
+        BARCAZA["<b>01. Barcaza Estructural y Chasis</b><br/>• Chasis en V Anti-minas<br/>• Cabestrante y Puntos de Fijación"]
+
+        subgraph AVIONICA ["Electrónica y Control"]
+            COM["<b>05. Comunicaciones Embarcadas</b><br/>• Data-link RF BLOS / LOS<br/>• Cifrado COMSEC"]
+            GNC["<b>04. Navegación y Control (GNC)</b><br/>• Computador de Misión<br/>• Sensores LiDAR / Cámaras 360°<br/>• Navegación sin GNSS (VIO)"]
+        end
+
+        subgraph PROPULSION ["Potencia y Movilidad"]
+            MOTOR["<b>03. Planta Motriz Híbrida</b><br/>• Motor Biocombustible (HVO)<br/>• Baterías Modo Silencioso (≥ 2 h)<br/>• Exportación Potencia (120 kW)"]
+            RODAJE["<b>02. Tren de Rodaje a Ruedas</b><br/>• Ruedas 4x4 / 6x6 / 8x8<br/>• Motores de Tracción<br/>• Suspensión Neumática Regulable"]
+        end
+    end
+
+    %% ==========================================
+    %% ZONA 3: CARGAS DE PAGO (MISIÓN)
+    %% ==========================================
+    subgraph CARGAS ["08. CARGAS DE PAGO MODULARES"]
+        PAYLOAD["<b>Módulo de Misión Acoplado</b><br/>• ISTAR (Mástil EO/IR)<br/>• Logístico (Palets Suministro)<br/>• MEDEVAC (Soporte Vital)"]
+    end
+
+    %% ==========================================
+    %% INTERFACES Y CONEXIONES (3 REDES CLAVE)
+    %% ==========================================
+
+    %% 1. Red de Datos / Control (Azul)
+    PMP <== "RF BLOS (Largo Alcance)" ==> COM
+    CPT <== "RF LOS (Línea de Vista)" ==> COM
+    UAV <== "Relé Vídeo / Datos" ==> COM
+
+    COM <== "Bus Interno CAN / Ethernet" ==> GNC
+    GNC ==>|"Consignas Drive-by-Wire"| RODAJE
+    GNC <== "Gestión Potencia (PMS)" ==> MOTOR
+    GNC <== "Control de Misión" ==> PAYLOAD
+
+    %% 2. Red de Energía / Potencia (Verde)
+    MOTOR ==>|"Potencia Eléctrica Tracción"| RODAJE
+    MOTOR -.->|"Alimentación Aviónica (24V/48V)"| GNC
+    MOTOR -.->|"Potencia Eléctrica Módulo"| PAYLOAD
+    MOTOR -.->|"Recarga Batería UAV (Techo)"| UAV
+
+    %% 3. Soporte Mecánico (Ámbar)
+    BARCAZA ---|"Montaje y Suspensión"| RODAJE
+    BARCAZA ---|"Anclaje Rápido Normalizado"| PAYLOAD
+
+    %% Clases de estilo visual
+    classDef externo fill:#1e293b,stroke:#0284c7,stroke-width:2px,color:#e0f2fe;
+    classDef vehiculo fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#ffffff;
+    classDef carga fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#ede9fe;
+
+    class PMP,CPT,UAV externo;
+    class BARCAZA,COM,GNC,MOTOR,RODAJE vehiculo;
+    class PAYLOAD carga;
+```
+
+---
+
+## 4. Topología de Conexiones (Internal Block Diagram - IBD)
 
 El archivo [`09_sistema_ugv.sysml`](Modelos/09_sistema_ugv.sysml) orquesta las tres redes de enlace del sistema:
 
@@ -65,7 +146,7 @@ El archivo [`09_sistema_ugv.sysml`](Modelos/09_sistema_ugv.sysml) orquesta las t
 
 ---
 
-## 4. Visualización Gráfica Interactiva
+## 5. Visualización Gráfica Interactiva
 
 En la carpeta [`Vistas graficas/`](Vistas%20graficas/) se incluye el visor interactivo de arquitectura:
 
@@ -73,7 +154,7 @@ En la carpeta [`Vistas graficas/`](Vistas%20graficas/) se incluye el visor inter
 
 ---
 
-## 5. Trazabilidad con el Pliego del CDTI
+## 6. Trazabilidad con el Pliego del CDTI
 
 Cada definición incluye docstrings formales que trazan los requisitos contractuales:
 * `RGEN-02..05`: Barcaza común modular y concepción robótica nativa.
