@@ -1,0 +1,90 @@
+schema: spec-driven
+
+context: |
+  Idioma de trabajo: español técnico.
+  Todos los artefactos de OpenSpec, explicaciones, documentación y comentarios nuevos deben escribirse en español.
+  Se conservarán en inglés los encabezados estructurales exigidos por OpenSpec y las palabras normativas SHALL/MUST.
+
+  PROPÓSITO Y ALCANCE DEL PROYECTO:
+  - El repositorio modela en SysML v2 un sistema UGV pesado: plataforma terrestre, planta motriz,
+    navegación y control, comunicaciones, estaciones de control, UAV cenital y cargas de misión.
+  - Los requisitos técnicos proceden del pliego de referencia y mantienen identificadores trazables
+    como RGEN, RLT1, RNAV, ROPE y RCOM.
+  - Los archivos de texto de 'Modelos/' versionados con Git son la fuente de verdad del modelo.
+  - El entorno de trabajo vigente es Git, un editor compatible con SysML v2 y Spec42.
+  - Docker, WSL, PostgreSQL y Eclipse SysON no forman parte del flujo activo. Los archivos conservados
+    en 'residuos/' son únicamente material histórico y no deben reactivarse salvo petición explícita.
+
+  REGLAS OBLIGATORIAS DE GIT:
+  - Todo cambio material en el proyecto debe realizarse en una rama dedicada; nunca se modificará
+    directamente la rama 'main'.
+  - Antes de crear una propuesta o editar archivos, el agente debe comprobar la rama actual y el estado
+    del repositorio. Si está en 'main', debe crear una rama con un nombre descriptivo o pedir al usuario
+    que indique el nombre cuando la elección pueda afectar al trabajo del equipo.
+  - Los cambios no relacionados que ya existan en el árbol de trabajo pertenecen al usuario y deben
+    preservarse.
+
+  FLUJO OBLIGATORIO DE OPENSPEC:
+  - Todo cambio material de arquitectura, comportamiento, requisitos, modelos, automatización o
+    funcionalidad del proyecto debe seguir este ciclo:
+    1. Propuesta: crear en 'openspec/changes/<nombre-cambio>/' los artefactos proposal.md, specs/,
+       design.md y tasks.md mediante opsx-propose.
+    2. Revisión: detenerse para que el usuario revise y apruebe el alcance antes de implementar.
+    3. Aplicación: ejecutar opsx-apply únicamente después de la aprobación, manteniendo tasks.md al día.
+    4. Verificación: validar sintaxis, coherencia, trazabilidad y vistas afectadas antes de cerrar.
+    5. Archivo: ejecutar opsx-archive para consolidar las especificaciones y conservar el historial.
+  - Una corrección puramente tipográfica que no cambie significado, requisitos, comportamiento ni
+    arquitectura puede realizarse sin una propuesta completa, pero siempre en una rama distinta de 'main'.
+  - Ningún agente debe editar 'Modelos/*.sysml' durante la fase de propuesta.
+
+  PROTECCIÓN DE REQUISITOS EXISTENTES:
+  - Un requisito ya definido en 'Modelos/*.sysml' o 'openspec/specs/' no puede eliminarse, relajarse,
+    sustituirse ni modificarse de forma directa o indirecta sin confirmación explícita del usuario.
+  - Si una petición entra en conflicto con un requisito vigente, el agente debe detenerse antes de crear
+    o modificar artefactos, identificar el requisito y su origen, explicar el valor actual, el cambio
+    propuesto y su impacto, y solicitar confirmación explícita.
+  - La confirmación y la justificación deben quedar registradas en proposal.md y en el delta de especificación.
+  - Añadir un requisito nuevo no autoriza a alterar uno existente ni a introducir una solución que lo incumpla.
+
+  CRITERIOS DE MODELADO Y VALIDACIÓN:
+  - Usar sintaxis SysML v2 y directivas 'private import'.
+  - Mantener las unidades explícitas y coherentes con 'TiposBase'. La masa se expresa en kg y debe usar
+    'TiposBase::Masa'.
+  - Preservar la trazabilidad entre requisitos, componentes, relaciones satisfy y sus identificadores del pliego.
+  - No se imponen límites de longitud, número de tareas, duración ni cantidad de requisitos por cambio.
+    Cada cambio debe tener el tamaño que exija el objetivo, con tareas suficientemente claras, ordenadas
+    y verificables para poder revisarlas y ejecutarlas de forma segura.
+  - La implementación no se considerará terminada sin comprobar los modelos afectados con Spec42 o,
+    si la herramienta no está disponible, sin documentar expresamente la validación pendiente.
+githubCopilot:
+  cloudAgent: false
+
+rules:
+  proposal:
+    - Explicar el problema, el objetivo, el alcance y lo que queda fuera del cambio.
+    - Identificar todos los archivos y subsistemas previsiblemente afectados.
+    - Enumerar los requisitos del pliego relacionados y señalar cualquier posible conflicto.
+    - Si se modifica un requisito existente, registrar la confirmación explícita del usuario y justificar el cambio.
+  specs:
+    - Redactar requisitos observables, inequívocos y verificables, conservando SHALL/MUST donde lo exija OpenSpec.
+    - Mantener la trazabilidad con los identificadores RGEN, RLT1, RNAV, ROPE o RCOM aplicables.
+    - No incluir requisitos MODIFIED o REMOVED sin confirmación explícita previa del usuario.
+  design:
+    - Justificar las decisiones de arquitectura y la sintaxis SysML v2 elegida.
+    - Describir interfaces, unidades, dependencias, relaciones y estrategia de validación.
+    - Indicar cómo se preserva la compatibilidad con el modelo y los requisitos existentes.
+  tasks:
+    - Desglosar el trabajo en pasos ordenados, revisables y con un resultado comprobable.
+    - No aplicar límites artificiales de longitud, duración o número de tareas.
+    - Incluir tareas de trazabilidad y una verificación final de sintaxis y vistas con Spec42.
+
+operations:
+  apply:
+    guidance:
+      - Confirmar que la propuesta fue aprobada antes de modificar los archivos objetivo.
+      - No ampliar silenciosamente el alcance; actualizar los artefactos si aparece una necesidad nueva.
+      - Marcar las tareas completadas y registrar cualquier validación que no haya podido ejecutarse.
+  archive:
+    guidance:
+      - Archivar únicamente cuando las tareas y verificaciones estén terminadas o las excepciones estén documentadas.
+      - Resumir las especificaciones consolidadas y las validaciones realizadas.
