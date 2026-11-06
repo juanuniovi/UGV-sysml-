@@ -18,6 +18,12 @@ Todo cambio material debe seguir OpenSpec:
 3. `opsx-apply`: aplica únicamente la propuesta aprobada.
 4. Verifica sintaxis, trazabilidad, requisitos y vistas afectadas.
 5. `opsx-archive`: consolida las especificaciones y archiva el cambio terminado.
+6. **Cierre e integración**:
+   - Evalúa y confirma si el trabajo completado respeta las buenas prácticas y convenciones del proyecto (sin alteraciones indebidas de requisitos, modelos íntegros y trazables).
+   - En caso afirmativo, consulta explícitamente al autor si desea:
+     a) Cerrar el *issue* de GitHub relacionado (si existe).
+     b) Fusionar (`merge`) la rama de trabajo dedicada en `main` y sincronizar (`push`) con el repositorio remoto.
+     c) Eliminar la rama temporal de trabajo tanto en local como en remoto.
 
 Durante la propuesta está prohibido editar directamente `Modelos/*.sysml`.
 
