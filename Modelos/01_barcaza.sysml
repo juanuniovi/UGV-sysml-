@@ -20,27 +20,6 @@ package SubsistemaBarcaza {
         attribute normaSTANAG : String;
     }
 
-    // --- Subsistema de Barcaza Principal ---
-
-    part def BarcazaEstructural {
-        attribute masa : Masa;
-
-        // Elementos estructurales integrados
-        part chasisProtegidoEnV : ChasisProtegidoEnV;
-        part cabestranteAutoRecuperacion : CabestranteAutoRecuperacion;
-        part ganchoRemolqueSTANAG4101 : GanchoRemolqueSTANAG;
-
-        // Puertos de montaje mecanico interno
-        port rodajeMount : MechanicalMountPort;
-        port powertrainMount : MechanicalMountPort;
-        port avionicaMount : MechanicalMountPort;
-
-        // Puntos de interfaz normalizados para cargas de pago (RGEN-28)
-        port interfazFrontalCarga : MechanicalMountPort;
-        port interfazSuperiorCarga : MechanicalMountPort;
-        port interfazTraseraCarga : MechanicalMountPort;
-    }
-
     // --- Requisitos Trazables del Pliego ---
 
     requirement def ReqBarcazaComun {
@@ -73,10 +52,31 @@ package SubsistemaBarcaza {
         require constraint { barcaza.masa >= 3500.0 and barcaza.masa <= 5000.0 }
     }
 
-    // --- Relaciones de Trazabilidad (Satisfy) ---
+    // --- Subsistema de Barcaza Principal ---
 
-    satisfy ReqBarcazaComun by BarcazaEstructural;
-    satisfy ReqProteccionCascoEnV by ChasisProtegidoEnV;
-    satisfy ReqCabestranteAutoRecuperacion by CabestranteAutoRecuperacion;
-    satisfy ReqGanchoSTANAG4101 by GanchoRemolqueSTANAG;
+    part def BarcazaEstructural {
+        attribute masa : Masa;
+
+        // Elementos estructurales integrados
+        part chasisProtegidoEnV : ChasisProtegidoEnV;
+        part cabestranteAutoRecuperacion : CabestranteAutoRecuperacion;
+        part ganchoRemolqueSTANAG4101 : GanchoRemolqueSTANAG;
+
+        // Puertos de montaje mecanico interno
+        port rodajeMount : MechanicalMountPort;
+        port powertrainMount : MechanicalMountPort;
+        port avionicaMount : MechanicalMountPort;
+
+        // Puntos de interfaz normalizados para cargas de pago (RGEN-28)
+        port interfazFrontalCarga : MechanicalMountPort;
+        port interfazSuperiorCarga : MechanicalMountPort;
+        port interfazTraseraCarga : MechanicalMountPort;
+
+        // Relaciones de satisfacción de requisitos
+        satisfy requirement : ReqBarcazaComun;
+        satisfy requirement : ReqProteccionCascoEnV by chasisProtegidoEnV;
+        satisfy requirement : ReqCabestranteAutoRecuperacion by cabestranteAutoRecuperacion;
+        satisfy requirement : ReqGanchoSTANAG4101 by ganchoRemolqueSTANAG4101;
+        satisfy requirement : ReqMasaTaraPlataforma;
+    }
 }
