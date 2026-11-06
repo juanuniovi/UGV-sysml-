@@ -33,6 +33,14 @@ Si una petición modifica, elimina, relaja, sustituye o contradice un requisito 
 
 No interpretes la petición de añadir un componente o requisito como autorización para alterar requisitos vigentes.
 
+## Acceso a documentos densos y pliegos de referencia
+
+Los documentos PDF oficiales ubicados en `docs/` (`curso_ROBOT_TERRESTRE_Contrato.pdf` y `curso_ROBOT_TERRESTRE_Anexo_I.pdf`) contienen pliegos y especificaciones contractuales muy extensas. Para preservar el contexto y evitar consumo innecesario de tokens:
+
+1. **Prohibición por defecto**: Ningún agente de IA debe leer, abrir, inspeccionar, indexar ni cargar en su contexto estos archivos de forma autónoma, automática o rutinaria.
+2. **Petición directa del usuario**: Solo se accederá a ellos cuando el usuario lo solicite de manera explícita y directa en su instrucción.
+3. **Propuesta previa justificada**: Si el agente detecta que consultar un dato específico de estos documentos resulta indispensable o conveniente para resolver una tarea o verificar un requisito, debe formular una propuesta en el chat detallando qué sección necesita consultar y por qué. Solo procederá a leer el archivo tras recibir la autorización expresa del usuario.
+
 ## Convenciones del proyecto
 
 - Redacta en español técnico.
