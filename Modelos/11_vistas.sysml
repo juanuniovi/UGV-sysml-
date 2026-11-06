@@ -65,4 +65,20 @@ package VistasUGV {
         doc /* Muestra los estados operativos de misión del UGV (Apagado, Teleoperado, Autónomo, Sigiloso y Degradado) y sus transiciones */
         expose ComportamientoUGV::ModosOperacionUGVStateMachine;
     }
+
+    // Vista 7: Estructura de bloques, puertos e ítems del Subsistema de Navegación y Control (equivalente a BDD)
+    view vistaEstructuraNavegacionControl : GeneralView {
+        doc /* Muestra la estructura de bloques (LiDAR, radar, visión por computador, módulo de detección/evasión y computador de autonomía), puertos e ítems de Navegación y Control (RGEN-09) */
+        expose SubsistemaNavegacionControl::*;
+        filter @SysML::PartDefinition or @SysML::PartUsage
+            or @SysML::PortDefinition or @SysML::PortUsage
+            or @SysML::ItemDefinition or @SysML::EnumerationDefinition
+            or @SysML::RequirementDefinition or @SysML::SatisfyRequirementUsage;
+    }
+
+    // Vista 8: Interconexiones internas del Subsistema de Navegación y Control (equivalente a IBD)
+    view vistaConexionesNavegacionControl : InterconnectionView {
+        doc /* Muestra las partes internas de SistemaNavegacionControl (sensores LiDAR, radar, visión por computador, detección/evasión, computador de autonomía y frenado), sus puertos y las conexiones de flujo de ítems entre ellas (RGEN-09) */
+        expose SubsistemaNavegacionControl::SistemaNavegacionControl;
+    }
 }

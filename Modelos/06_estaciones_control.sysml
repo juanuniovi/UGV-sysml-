@@ -9,6 +9,7 @@ package SubsistemaEstacionesControl {
         part estacionTrabajoRugerizada;
         part pantallaTactilMision;
         part interfazGraficaLinux;
+        part selectorModoDeteccionSigiloso; // Conmutacion modo deteccion NORMAL / SIGILOSO (RGEN-09)
         part terminalRadioBLOS;
         part pergolaYAuxiliares;
         part grupoGeneradorAuxiliar;
@@ -22,6 +23,7 @@ package SubsistemaEstacionesControl {
         part terminalManoRugerizado;
         part mandosTacticosJoysticks;
         part pantallaVideoDirecto;
+        part selectorModoDeteccionSigiloso; // Conmutacion modo deteccion NORMAL / SIGILOSO (RGEN-09)
         part radioEnlaceLOS;
 
         port rfPortLOS : RFPort;
