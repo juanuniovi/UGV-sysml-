@@ -9,8 +9,8 @@ Sin embargo, al tratarse de archivos PDF extensos y densos, su lectura indiscrim
 ## What Changes
 
 - Incorporación de los archivos oficiales de pliegos y contrato en el repositorio:
-  - `docs/curso_ROBOT_TERRESTRE_Contrato.pdf` (copiado desde la ruta de descargas).
-  - `docs/curso_ROBOT_TERRESTRE_Anexo_I.pdf` (copiado desde la ruta de descargas).
+  - `docs/ROBOT_TERRESTRE_Contrato.pdf` (copiado desde la ruta de descargas).
+  - `docs/TERRESTRE_Anexo_I.pdf` (copiado desde la ruta de descargas).
 - Actualización de `AGENTS.md` con una nueva sección normativa que regula el acceso a documentos densos y pliegos de referencia:
   - Prohibición de lectura o precarga automática de estos archivos.
   - Procedimiento de autorización previa obligatoria cuando el agente considere justificado consultar algún apartado específico.
@@ -27,8 +27,8 @@ Sin embargo, al tratarse de archivos PDF extensos y densos, su lectura indiscrim
 ## Impact
 
 - **Archivos afectados**:
-  - `docs/curso_ROBOT_TERRESTRE_Contrato.pdf` (nuevo archivo binario de referencia).
-  - `docs/curso_ROBOT_TERRESTRE_Anexo_I.pdf` (nuevo archivo binario de referencia).
+  - `docs/ROBOT_TERRESTRE_Contrato.pdf` (nuevo archivo binario de referencia).
+  - `docs/ROBOT_TERRESTRE_Anexo_I.pdf` (nuevo archivo binario de referencia).
   - `AGENTS.md` (incorporación de la regla de acceso controlado a documentos densos).
 - **Modelos SysML v2**: Ningún archivo en `Modelos/*.sysml` resulta modificado; no se altera ningún requisito técnico (RGEN, RLT1, RNAV, ROPE, RCOM).
 - **Consumo de recursos**: Se reduce drásticamente el consumo de tokens y se evita la degradación del contexto de razonamiento en futuras interacciones con agentes.

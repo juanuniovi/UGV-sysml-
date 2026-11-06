@@ -19,7 +19,7 @@ Véase `proposal.md` para la motivación y el alcance de este cambio. El reposit
 ## Decisions
 
 ### Decisión 1: Ubicación física de los documentos en `docs/`
-- **Elección**: Copiar los dos archivos PDF directamente a la raíz de `docs/`: `docs/curso_ROBOT_TERRESTRE_Contrato.pdf` y `docs/curso_ROBOT_TERRESTRE_Anexo_I.pdf`.
+- **Elección**: Copiar los dos archivos PDF directamente a la raíz de `docs/`: `docs/ROBOT_TERRESTRE_Contrato.pdf` y `docs/ROBOT_TERRESTRE_Anexo_I.pdf`.
 - **Razón**: Satisface de forma directa la petición del usuario manteniendo los nombres originales del pliego para trazabilidad inmediata.
 - **Alternativas consideradas**:
   - `docs/pliegos/`: Añadía un nivel de anidamiento innecesario dado el reducido número de documentos maestros.

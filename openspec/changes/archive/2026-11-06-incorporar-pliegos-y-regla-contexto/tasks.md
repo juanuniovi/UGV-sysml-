@@ -2,8 +2,8 @@
 
 ## 1. Incorporación de documentación oficial en `docs/`
 
-- [x] 1.1 Copiar `curso_ROBOT_TERRESTRE_Contrato.pdf` desde la ruta de descargas a `docs/` y verificar que el archivo existe y conserva su tamaño íntegro (~426 KB).
-- [x] 1.2 Copiar `curso_ROBOT_TERRESTRE_Anexo_I.pdf` desde la ruta de descargas a `docs/` y verificar que el archivo existe y conserva su tamaño íntegro (~562 KB).
+- [x] 1.1 Copiar `ROBOT_TERRESTRE_Contrato.pdf` desde la ruta de descargas a `docs/` y verificar que el archivo existe y conserva su tamaño íntegro (~426 KB).
+- [x] 1.2 Copiar `ROBOT_TERRESTRE_Anexo_I.pdf` desde la ruta de descargas a `docs/` y verificar que el archivo existe y conserva su tamaño íntegro (~562 KB).
 - [x] 1.3 Verificar que los archivos web preexistentes en `docs/` (`index.html`, `app.js`, `styles.css`, `.nojekyll`, `README.md`) permanecen inalterados.
 
 ## 2. Actualización normativa en `AGENTS.md`
