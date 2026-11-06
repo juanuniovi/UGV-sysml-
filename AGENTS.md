@@ -7,7 +7,9 @@ Estas instrucciones se aplican a todo el repositorio y a cualquier agente de IA 
 1. Lee íntegramente `openspec/config.yaml`.
 2. Comprueba `git status --short --branch`.
 3. No trabajes directamente sobre `main`. Para cualquier cambio, usa una rama dedicada.
-4. Conserva todos los cambios previos del usuario que no pertenezcan a la tarea actual.
+4. Desarrolla y valida exhaustivamente en la rama dedicada: todo el ciclo de edición, depuración y resolución de advertencias de Spec42 debe completarse en la rama antes de plantear la integración. Queda terminantemente prohibido subir micro-commits o entregas fragmentarias a `main`.
+5. Trabaja por bloques funcionales completos y consolidados.
+6. Conserva todos los cambios previos del usuario que no pertenezcan a la tarea actual.
 
 ## Flujo obligatorio
 
@@ -19,7 +21,7 @@ Todo cambio material debe seguir OpenSpec:
 4. Verifica sintaxis, trazabilidad, requisitos y vistas afectadas.
 5. `opsx-archive`: consolida las especificaciones y archiva el cambio terminado.
 6. **Cierre e integración**:
-   - Evalúa y confirma si el trabajo completado respeta las buenas prácticas y convenciones del proyecto (sin alteraciones indebidas de requisitos, modelos íntegros y trazables).
+   - Evalúa y confirma si el trabajo completado respeta las buenas prácticas y convenciones del proyecto (sin alteraciones indebidas de requisitos, modelos íntegros y trazables, bloque funcional completo y 0 errores y 0 avisos en Spec42).
    - En caso afirmativo, consulta explícitamente al autor si desea:
      a) Cerrar el *issue* de GitHub relacionado (si existe).
      b) Fusionar (`merge`) la rama de trabajo dedicada en `main` y sincronizar (`push`) con el repositorio remoto.

@@ -21,6 +21,10 @@ context: |
   - Antes de crear una propuesta o editar archivos, el agente debe comprobar la rama actual y el estado
     del repositorio. Si está en 'main', debe crear una rama con un nombre descriptivo o pedir al usuario
     que indique el nombre cuando la elección pueda afectar al trabajo del equipo.
+  - Desarrollar y depurar exhaustivamente en la rama dedicada: toda la iteración, pruebas y resolución de
+    advertencias con Spec42 debe completarse en la rama antes de fusionar. Queda prohibido subir micro-commits
+    o entregas fragmentarias a 'main'.
+  - Los commits deben conformar bloques funcionales completos, coherentes y consolidados.
   - Los cambios no relacionados que ya existan en el árbol de trabajo pertenecen al usuario y deben
     preservarse.
 
