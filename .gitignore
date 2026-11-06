@@ -18,3 +18,7 @@ node_modules/
 dist/
 build/
 .cache/
+
+# Notas y planes de trabajo personales de desarrollo
+plan_desarrollo_barcaza.md
+
