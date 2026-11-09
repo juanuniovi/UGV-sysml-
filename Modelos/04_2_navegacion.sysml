@@ -1,5 +1,5 @@
-package SubsistemaNavegacionControl {
-    doc /* Sistema de Guiado, Navegacion y Control (GNC) y Suite de Sensores (ROPE, RNAV, RGEN-09) */
+package SubsistemaNavegacion {
+    doc /* Subsistema 4.2 de Navegacion, Percepcion y Deteccion de Obstaculos (RNAV-01, ROPE-06, RGEN-09, RGEN-20, RGEN-22) */
     private import ScalarValues::*;
     private import TiposBase::*;
 
@@ -10,7 +10,7 @@ package SubsistemaNavegacionControl {
         enum SIGILOSO;
     }
 
-    // --- Items de Informacion Sensorial y Control (RGEN-09) ---
+    // --- Items de Informacion Sensorial y Control de Emision (RGEN-09) ---
     item def DatosLidar {
         doc /* Nube de puntos 3D y distancias procedentes de sensores LiDAR (tecnologia radiante, RGEN-09) */
     }
@@ -28,7 +28,7 @@ package SubsistemaNavegacionControl {
     }
 
     item def ComandoModoDeteccion {
-        doc /* Orden de conmutacion entre modo de deteccion NORMAL y SIGILOSO desde Equipos de Control (RGEN-09) */
+        doc /* Orden de conmutacion entre modo de deteccion NORMAL y SIGILOSO desde Equipos de Control via SubsistemaControl (RGEN-09) */
         attribute modoObjetivo : ModoDeteccionObstaculos;
     }
 
@@ -37,21 +37,15 @@ package SubsistemaNavegacionControl {
         attribute emitir : Boolean;
     }
 
-    item def ConsignaNavegacionAutonoma {
-        doc /* Consignas de direccion, traccion y frenado generadas por el computador de autonomia (ROPE-05, ROPE-06) */
-    }
-
-    // --- Definiciones de Puertos con Flujo de Items (RGEN-09) ---
+    // --- Definiciones de Puertos con Flujo de Items (RGEN-09, RNAV-01) ---
     port def PuertoDatosLidar {
-        doc /* Puerto de datos LiDAR y control de emision radiante */
+        doc /* Puerto de salida de datos LiDAR hacia fusion de obstaculos */
         out item datos : DatosLidar;
-        in item controlEmision : ControlEmisionRadiante;
     }
 
     port def PuertoDatosRadar {
-        doc /* Puerto de datos radar y control de emision radiante */
+        doc /* Puerto de salida de datos radar hacia fusion de obstaculos */
         out item datos : DatosRadar;
-        in item controlEmision : ControlEmisionRadiante;
     }
 
     port def PuertoDatosVision {
@@ -70,7 +64,7 @@ package SubsistemaNavegacionControl {
     }
 
     port def PuertoMapaObstaculos {
-        doc /* Puerto de entrega del mapa de obstaculos estaticos y dinamicos al computador de autonomia */
+        doc /* Puerto de entrega del mapa de obstaculos estaticos y dinamicos hacia el Subsistema de Control */
         out item mapa : MapaObstaculosDetectados;
     }
 
@@ -79,23 +73,20 @@ package SubsistemaNavegacionControl {
         out item comando : ComandoModoDeteccion;
     }
 
-    port def PuertoConsignaAutonomia {
-        doc /* Puerto de envio de consignas de navegacion autonoma hacia el modulo de frenado y actuacion */
-        out item consigna : ConsignaNavegacionAutonoma;
-    }
-
-    // --- Definiciones de Partes Internas del Subsistema de Navegacion y Control ---
+    // --- Definiciones de Partes Internas del Subsistema 4.2 de Navegacion ---
     part def SensorLidar {
-        doc /* Sensor LiDAR 3D de tecnologia radiante, desactivable en modo de deteccion SIGILOSO (RGEN-09) */
+        doc /* Sensor LiDAR 3D de tecnologia radiante, desactivable en modo de deteccion SIGILOSO desde Comunicaciones (RGEN-09) */
         attribute emisionActiva : Boolean;
         port puertoLidar : PuertoDatosLidar;
+        port controlModoDeteccion : DataBusPort;
         port powerInput : ElectricalPowerPort;
     }
 
     part def SensorRadar {
-        doc /* Sensor radar de tecnologia radiante para deteccion de obstaculos, desactivable en modo SIGILOSO (RGEN-09) */
+        doc /* Sensor radar de tecnologia radiante para deteccion de obstaculos, desactivable en modo SIGILOSO desde Comunicaciones (RGEN-09) */
         attribute emisionActiva : Boolean;
         port puertoRadar : PuertoDatosRadar;
+        port controlModoDeteccion : DataBusPort;
         port powerInput : ElectricalPowerPort;
     }
 
@@ -123,31 +114,15 @@ package SubsistemaNavegacionControl {
     }
 
     part def ModuloDeteccionEvasion {
-        doc /* Fusiona datos de LiDAR, radar y vision por computador y gestiona la emision radiante en modo NORMAL/SIGILOSO (RGEN-09, ROPE-06) */
+        doc /* Fusiona datos de LiDAR, radar y vision por computador para obtener el mapa de obstaculos (RGEN-09, ROPE-06) */
         attribute modoDeteccionActual : ModoDeteccionObstaculos;
         port entradaLidar : ~PuertoDatosLidar;
         port entradaRadar : ~PuertoDatosRadar;
         port entradaVision : ~PuertoDatosVision;
-        port entradaModoDeteccion : ~PuertoComandoModoDeteccion;
         port salidaObstaculos : PuertoMapaObstaculos;
     }
 
-    part def ComputadorAutonomia {
-        doc /* Computador de navegacion autonoma por waypoints y Follow-Me que recibe obstaculos y comandos de control (ROPE-05, RGEN-09) */
-        port entradaObstaculos : ~PuertoMapaObstaculos;
-        port entradaOdometria : ~PuertoOdometriaVIO;
-        port salidaModoDeteccion : PuertoComandoModoDeteccion;
-        port salidaConsigna : PuertoConsignaAutonomia;
-        port busComunicaciones : DataBusPort;
-    }
-
-    part def ModuloFrenadoSeguridad {
-        doc /* Modulo de frenado automatico de emergencia con override manual hacia drive-by-wire (RGEN-17) */
-        port entradaConsigna : ~PuertoConsignaAutonomia;
-        port salidaActuacion : DataBusPort;
-    }
-
-    // --- Acciones de Deteccion de Obstaculos y Navegacion Autonoma (RGEN-09) ---
+    // --- Acciones de Deteccion de Obstaculos y Gestion de Emision Radiante (RGEN-09) ---
     action def ConfigurarModoDeteccion {
         doc /* Activa o desactiva las tecnologias radiantes (LiDAR, radar) conmutando entre modo NORMAL y SIGILOSO (RGEN-09) */
         in comando : ComandoModoDeteccion;
@@ -174,32 +149,27 @@ package SubsistemaNavegacionControl {
         first adquirirVisionComputador then fusionarObstaculosEstaticosDinamicos;
     }
 
-    action def NavegarAutonomamenteConDeteccion {
-        doc /* Navegacion autonoma local alimentada por LiDAR, radar y vision por computador (RGEN-09, ROPE-05, ROPE-06) */
-        in datosLidar : DatosLidar[0..1];
-        in datosRadar : DatosRadar[0..1];
-        in datosVision : DatosVisionComputador;
-        in modoActual : ModoDeteccionObstaculos;
-        out consigna : ConsignaNavegacionAutonoma;
-
-        action detectarObstaculos : DetectarObstaculosNavegacion;
-        action calcularTrayectoriaEvasion { out trayectoriaSegura : Boolean; }
-        action generarConsignasControlLocal { out consignaLista : Boolean; }
-        first detectarObstaculos then calcularTrayectoriaEvasion;
-        first calcularTrayectoriaEvasion then generarConsignasControlLocal;
+    requirement def ReqNavegacionGNSSDenegado {
+        subject nav : SistemaNavegacion;
+        doc /* Navegacion autonoma precisa ante inhibicion de senal satelital (RNAV-01). */
+        require constraint { true }
     }
 
-    // --- Bloque Principal del Subsistema de Navegacion y Control ---
-    part def SistemaNavegacionControl {
-        // Estado local de modo de deteccion de obstaculos (RGEN-09)
+    requirement def ReqDeteccionObstaculosModoSigiloso {
+        subject nav : SistemaNavegacion;
+        doc /* Deteccion de obstaculos estaticos y dinamicos mediante tecnologias radiantes (LiDAR, radar) y no radiantes (vision por computador), con activacion/desactivacion de tecnologias radiantes entre modo NORMAL y SIGILOSO desde los Equipos de Control en cualquier Modo de Operacion (RGEN-09). */
+        require constraint { true }
+    }
+
+    // --- Bloque Principal del Subsistema 4.2 de Navegacion ---
+    part def SistemaNavegacion {
+        doc /* Ensamblaje de sensores radiantes, no radiantes, fusion de obstaculos y odometria VIO (RGEN-09, RNAV-01, ROPE-06) */
         attribute modoDeteccionActual : ModoDeteccionObstaculos;
         attribute tecnologiasRadiantesActivas : Boolean;
 
-        // Computadores y logica de navegacion
-        part computadorAutonomia : ComputadorAutonomia;               // Waypoints georreferenciados y Follow-Me (ROPE-05)
+        // Modulos de fusion de obstaculos y posicionamiento inercial-visual
         part moduloDeteccionEvasion : ModuloDeteccionEvasion;         // Detect & Avoid en tiempo real (ROPE-06, RGEN-09)
         part odometriaVisualInercialVIO : OdometriaVisualInercialVIO; // Posicionamiento en GNSS denegado (RNAV-01)
-        part moduloFrenadoSeguridad : ModuloFrenadoSeguridad;         // Frenado automatico con override manual (RGEN-17)
 
         // Sensores de percepcion situacional y deteccion de obstaculos (RGEN-09)
         part camarasOpticas360 : CamarasOpticas360;                   // Cobertura visual 360 grados (RGEN-20)
@@ -208,11 +178,12 @@ package SubsistemaNavegacionControl {
         part sensoresRadar : SensorRadar;                             // Tecnologia radiante desactivable en modo sigiloso (RGEN-09)
         part sistemaVisionComputador : SistemaVisionComputador;       // Tecnologia no radiante pasiva de vision por computador (RGEN-09)
 
-        // Puertos externos del subsistema hacia la plataforma UGV
+        // Puertos externos del subsistema hacia la plataforma UGV, Comunicaciones y el Subsistema 4.1 de Control
         port chassisMount : MechanicalMountPort;
         port powerInput : ElectricalPowerPort;
-        port dataBus : DataBusPort;
-        port driveByWireOutput : DataBusPort;
+        port salidaObstaculos : PuertoMapaObstaculos;
+        port salidaOdometria : PuertoOdometriaVIO;
+        port entradaModoDeteccion : DataBusPort;
 
         // Conexiones internas de sensores radiantes y no radiantes hacia deteccion de obstaculos (RGEN-09)
         connection c_lidar_deteccion connect sensoresLidar.puertoLidar to moduloDeteccionEvasion.entradaLidar;
@@ -221,35 +192,16 @@ package SubsistemaNavegacionControl {
         connection c_camaras360_vision connect camarasOpticas360.puertoVideo to sistemaVisionComputador.entradaOptica;
         connection c_termica_vision connect camaraTermicaNocturna.puertoVideo to sistemaVisionComputador.entradaTermica;
 
-        // Conexiones internas entre deteccion de obstaculos, computador de autonomia y odometria VIO
-        connection c_obstaculos_autonomia connect moduloDeteccionEvasion.salidaObstaculos to computadorAutonomia.entradaObstaculos;
-        connection c_modo_deteccion connect computadorAutonomia.salidaModoDeteccion to moduloDeteccionEvasion.entradaModoDeteccion;
-        connection c_vio_autonomia connect odometriaVisualInercialVIO.puertoOdometria to computadorAutonomia.entradaOdometria;
-        connection c_autonomia_frenado connect computadorAutonomia.salidaConsigna to moduloFrenadoSeguridad.entradaConsigna;
+        // Conexiones de apagado/encendido de LiDAR y radar desde el puerto de modo de deteccion (RGEN-09)
+        connection c_modo_lidar connect entradaModoDeteccion to sensoresLidar.controlModoDeteccion;
+        connection c_modo_radar connect entradaModoDeteccion to sensoresRadar.controlModoDeteccion;
 
-        // Conexiones con los puertos externos del subsistema (Comunicaciones/Equipos de Control y Drive-by-Wire)
-        connection c_bus_comunicaciones connect dataBus to computadorAutonomia.busComunicaciones;
-        connection c_frenado_dbw connect moduloFrenadoSeguridad.salidaActuacion to driveByWireOutput;
+        // Conexiones internas hacia los puertos de contorno que enlazan con SubsistemaControl
+        binding c_salida_obstaculos_interno bind moduloDeteccionEvasion.salidaObstaculos = salidaObstaculos;
+        binding c_salida_vio_interno bind odometriaVisualInercialVIO.puertoOdometria = salidaOdometria;
 
-        // Acciones locales de navegacion y gestion de modo de deteccion (RGEN-09)
+        // Acciones locales de deteccion y gestion de modo de deteccion (RGEN-09)
         perform action configurarModoDeteccion : ConfigurarModoDeteccion;
         perform action detectarObstaculos : DetectarObstaculosNavegacion;
-        perform action navegarAutonomamente : NavegarAutonomamenteConDeteccion;
     }
-
-    part subsistemaGNC : SistemaNavegacionControl;
-
-    requirement def ReqNavegacionGNSSDenegado {
-        subject gnc : SistemaNavegacionControl;
-        doc /* Navegacion autonoma precisa ante inhibicion de senal satelital (RNAV-01). */
-        require constraint { true }
-    }
-
-    requirement def ReqDeteccionObstaculosModoSigiloso {
-        subject gnc : SistemaNavegacionControl;
-        doc /* Deteccion de obstaculos estaticos y dinamicos mediante tecnologias radiantes (LiDAR, radar) y no radiantes (vision por computador), con activacion/desactivacion de tecnologias radiantes entre modo NORMAL y SIGILOSO desde los Equipos de Control en cualquier Modo de Operacion (RGEN-09). */
-        require constraint { true }
-    }
-
-    satisfy requirement : ReqDeteccionObstaculosModoSigiloso by subsistemaGNC;
 }

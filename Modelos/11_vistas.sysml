@@ -6,7 +6,8 @@ package VistasUGV {
     private import SubsistemaBarcaza::*;
     private import SubsistemaTrenRodaje::*;
     private import SubsistemaPlantaMotriz::*;
-    private import SubsistemaNavegacionControl::*;
+    private import SubsistemaControl::*;
+    private import SubsistemaNavegacion::*;
     private import SubsistemaComunicaciones::*;
     private import SubsistemaEstacionesControl::*;
     private import SubsistemaUAVCenital::*;
@@ -49,7 +50,8 @@ package VistasUGV {
         expose SubsistemaBarcaza::*;
         expose SubsistemaTrenRodaje::*;
         expose SubsistemaPlantaMotriz::*;
-        expose SubsistemaNavegacionControl::*;
+        expose SubsistemaControl::*;
+        expose SubsistemaNavegacion::*;
         expose SubsistemaComunicaciones::*;
         expose SubsistemaEstacionesControl::*;
         expose SubsistemaUAVCenital::*;
@@ -66,19 +68,33 @@ package VistasUGV {
         expose ComportamientoUGV::ModosOperacionUGVStateMachine;
     }
 
-    // Vista 7: Estructura de bloques, puertos e ítems del Subsistema de Navegación y Control (equivalente a BDD)
+    // Vista 7: Estructura conjunta de los Subsistemas 4.1 Control y 4.2 Navegación (equivalente a BDD)
     view vistaEstructuraNavegacionControl : GeneralView {
-        doc /* Muestra la estructura de bloques (LiDAR, radar, visión por computador, módulo de detección/evasión y computador de autonomía), puertos e ítems de Navegación y Control (RGEN-09) */
-        expose SubsistemaNavegacionControl::*;
-        filter @SysML::PartDefinition or @SysML::PartUsage
-            or @SysML::PortDefinition or @SysML::PortUsage
-            or @SysML::ItemDefinition or @SysML::EnumerationDefinition
-            or @SysML::RequirementDefinition or @SysML::SatisfyRequirementUsage;
+        doc /* Muestra conjuntamente las dos partes (control y navegacion) con sus bloques internos (computador de autonomía y sus tres subsistemas ROS 2, frenado, LiDAR, radar, visión por computador, cámaras, detección/evasión y odometría VIO), sus puertos y conexiones (RGEN-09, RNAV-01, ROPE-05, ROPE-06, RGEN-17) */
+        expose SistemaUGV::PlataformaUGV::control;
+        expose SubsistemaControl::SistemaControl::computadorAutonomia;
+        expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::c_nav_obstaculos_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_nav_vio_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_comms_modo_nav;
+        expose SistemaUGV::PlataformaUGV::c_comms_frenado_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
+        filter @SysML::PartUsage or @SysML::PortUsage
+            or @SysML::ConnectionUsage or @SysML::BindingConnectorAsUsage;
     }
 
-    // Vista 8: Interconexiones internas del Subsistema de Navegación y Control (equivalente a IBD)
+    // Vista 8: Interconexiones conjuntas de los Subsistemas 4.1 Control y 4.2 Navegación (equivalente a IBD)
     view vistaConexionesNavegacionControl : InterconnectionView {
-        doc /* Muestra las partes internas de SistemaNavegacionControl (sensores LiDAR, radar, visión por computador, detección/evasión, computador de autonomía y frenado), sus puertos y las conexiones de flujo de ítems entre ellas (RGEN-09) */
-        expose SubsistemaNavegacionControl::SistemaNavegacionControl;
+        doc /* Muestra conjuntamente ambas partes (control y navegacion), el interior de computadorAutonomia (fusión y estado, planificación y evaluación, y supervisor de seguridad), sus puertos y las conexiones tanto internas como con Comunicaciones y entre Navegación y Control (RGEN-09, RNAV-01, RGEN-17) */
+        expose SistemaUGV::PlataformaUGV::control;
+        expose SubsistemaControl::SistemaControl::computadorAutonomia;
+        expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::c_nav_obstaculos_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_nav_vio_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_comms_modo_nav;
+        expose SistemaUGV::PlataformaUGV::c_comms_frenado_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
     }
 }
