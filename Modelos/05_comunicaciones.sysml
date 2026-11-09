@@ -13,6 +13,8 @@ package SubsistemaComunicaciones {
         port chassisMount : MechanicalMountPort;
         port powerInput : ElectricalPowerPort;
         port dataBus : DataBusPort;
+        port salidaModoDeteccion : DataBusPort;
+        port salidaInhabilitacionFrenado : DataBusPort;
         port rfPortBLOS : RFPort;
         port rfPortLOS : RFPort;
     }

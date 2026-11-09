@@ -5,7 +5,8 @@ package SistemaUGV {
     private import SubsistemaBarcaza::*;
     private import SubsistemaTrenRodaje::*;
     private import SubsistemaPlantaMotriz::*;
-    private import SubsistemaNavegacionControl::*;
+    private import SubsistemaControl::*;
+    private import SubsistemaNavegacion::*;
     private import SubsistemaComunicaciones::*;
     private import SubsistemaEstacionesControl::*;
     private import SubsistemaUAVCenital::*;
@@ -95,23 +96,32 @@ package SistemaUGV {
         part barcaza : BarcazaEstructural;
         part rodaje : TrenRodajeRuedas;
         part plantaMotriz : PlantaMotrizHibrida;
-        part navegacionControl : SistemaNavegacionControl;
+        part control : SistemaControl;
+        part navegacion : SistemaNavegacion;
         part comunicaciones : SistemaComunicacionesEmbarcado;
 
         // Conexiones estructurales internas
         connection c_barcaza_rodaje connect barcaza.rodajeMount to rodaje.chassisMount;
         connection c_barcaza_powertrain connect barcaza.powertrainMount to plantaMotriz.chassisMount;
-        connection c_barcaza_avionica connect barcaza.avionicaMount to navegacionControl.chassisMount;
+        connection c_barcaza_control connect barcaza.avionicaMount to control.chassisMount;
+        connection c_barcaza_navegacion connect barcaza.avionicaMount to navegacion.chassisMount;
 
         // Conexiones de potencia electrica
         connection c_power_traction connect plantaMotriz.powerOutputTraction to rodaje.powerInput;
-        connection c_power_avionics connect plantaMotriz.powerOutputAvionics to navegacionControl.powerInput;
+        connection c_power_control connect plantaMotriz.powerOutputAvionics to control.powerInput;
+        connection c_power_navegacion connect plantaMotriz.powerOutputAvionics to navegacion.powerInput;
         connection c_power_comms connect plantaMotriz.powerOutputAvionics to comunicaciones.powerInput;
 
         // Conexiones de bus de datos y drive-by-wire
-        connection c_bus_comms_gnc connect comunicaciones.dataBus to navegacionControl.dataBus;
-        connection c_drive_by_wire connect navegacionControl.driveByWireOutput to rodaje.controlBus;
-        connection c_pms_control connect navegacionControl.dataBus to plantaMotriz.controlBus;
+        connection c_bus_comms_control connect comunicaciones.dataBus to control.dataBus;
+        connection c_drive_by_wire connect control.driveByWireOutput to rodaje.controlBus;
+        connection c_pms_control connect control.dataBus to plantaMotriz.controlBus;
+
+        // Conexiones entre el Subsistema 4.2 de Navegacion, Comunicaciones y el Subsistema 4.1 de Control (RGEN-09, RNAV-01, ROPE-06, RGEN-17)
+        connection c_nav_obstaculos_ctrl connect navegacion.salidaObstaculos to control.entradaObstaculos;
+        connection c_nav_vio_ctrl connect navegacion.salidaOdometria to control.entradaOdometria;
+        connection c_comms_modo_nav connect comunicaciones.salidaModoDeteccion to navegacion.entradaModoDeteccion;
+        connection c_comms_frenado_ctrl connect comunicaciones.salidaInhabilitacionFrenado to control.entradaInhabilitacionFrenado;
 
         // Relaciones de satisfaccion de requisitos generales de plataforma
         satisfy requirement : ReqMasaMaximaOrdenMision;
@@ -124,6 +134,9 @@ package SistemaUGV {
         satisfy requirement : ReqResistenciaAmbiental;
         satisfy requirement : ReqEstibaTransporteEstrategico;
         satisfy requirement : ReqEstabilidadPuntosInterfaz;
+        satisfy requirement : ReqNavegacionGNSSDenegado by navegacion;
+        satisfy requirement : ReqDeteccionObstaculosModoSigiloso by navegacion;
+        satisfy requirement : ReqFrenadoAutomaticoColision by control;
     }
 
     // --- Sistema de Interes Completo (SoI) ---
@@ -144,7 +157,7 @@ package SistemaUGV {
         // Acople fisico, energetico y logico de carga de pago instalada
         connection c_payload_mount connect vehiculo.barcaza.interfazSuperiorCarga to cargaPagoMision.chassisMount;
         connection c_payload_power connect vehiculo.plantaMotriz.powerOutputPayload to cargaPagoMision.powerInput;
-        connection c_payload_data connect vehiculo.navegacionControl.dataBus to cargaPagoMision.dataBus;
+        connection c_payload_data connect vehiculo.control.dataBus to cargaPagoMision.dataBus;
 
         // Recarga y sustentacion del UAV cenital en techo del UGV
         connection c_uav_landing connect vehiculo.barcaza.interfazSuperiorCarga to uavCenital.landingMount;
