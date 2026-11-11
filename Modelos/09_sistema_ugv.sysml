@@ -117,11 +117,13 @@ package SistemaUGV {
         connection c_drive_by_wire connect control.driveByWireOutput to rodaje.controlBus;
         connection c_pms_control connect control.dataBus to plantaMotriz.controlBus;
 
-        // Conexiones entre el Subsistema 4.2 de Navegacion, Comunicaciones y el Subsistema 4.1 de Control (RGEN-09, RNAV-01, ROPE-06, RGEN-17)
+        // Conexiones entre el Subsistema 4.2 de Navegacion, Comunicaciones y el Subsistema 4.1 de Control (RGEN-09, RNAV-01, ROPE-06, RGEN-17, RGEN-22)
         connection c_nav_obstaculos_ctrl connect navegacion.salidaObstaculos to control.entradaObstaculos;
         connection c_nav_vio_ctrl connect navegacion.salidaOdometria to control.entradaOdometria;
         connection c_comms_modo_nav connect comunicaciones.salidaModoDeteccion to navegacion.entradaModoDeteccion;
         connection c_comms_frenado_ctrl connect comunicaciones.salidaInhabilitacionFrenado to control.entradaInhabilitacionFrenado;
+        connection c_nav_video_comms connect navegacion.salidaVideoTeleoperacion to comunicaciones.entradaVideoTeleoperacion;
+        connection c_nav_rodaje_comms connect navegacion.salidaEstadoRodaje to comunicaciones.entradaEstadoRodaje;
 
         // Relaciones de satisfaccion de requisitos generales de plataforma
         satisfy requirement : ReqMasaMaximaOrdenMision;
@@ -136,6 +138,7 @@ package SistemaUGV {
         satisfy requirement : ReqEstabilidadPuntosInterfaz;
         satisfy requirement : ReqNavegacionGNSSDenegado by navegacion;
         satisfy requirement : ReqDeteccionObstaculosModoSigiloso by navegacion;
+        satisfy requirement : ReqConcienciaSituacionalVisionSensores by navegacion;
         satisfy requirement : ReqFrenadoAutomaticoColision by control;
     }
 
