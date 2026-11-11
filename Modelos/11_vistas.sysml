@@ -99,4 +99,10 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
     }
+
+    // Vista 9: Interconexiones del Subsistema de Comunicaciones (equivalente a IBD)
+    view vistaConexionesComunicaciones : InterconnectionView {
+        doc /* Muestra la topología de interconexiones del Subsistema de Comunicaciones Embarcado (RCOM-01) */
+        expose SubsistemaComunicaciones::SistemaComunicacionesEmbarcado;
+    }
 }
