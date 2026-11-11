@@ -37,6 +37,10 @@ package SubsistemaNavegacion {
         attribute emitir : Boolean;
     }
 
+    item def DatosEstadoRodaje {
+        doc /* Informacion en tiempo real del estado del tren de rodaje adquirida por transductores de contacto y dinamicos (RGEN-22) */
+    }
+
     // --- Definiciones de Puertos con Flujo de Items (RGEN-09, RNAV-01) ---
     port def PuertoDatosLidar {
         doc /* Puerto de salida de datos LiDAR hacia fusion de obstaculos */
@@ -99,13 +103,73 @@ package SubsistemaNavegacion {
     }
 
     part def CamarasOpticas360 {
-        doc /* Suite de camaras opticas de cobertura 360 grados (RGEN-20) */
+        doc /* Suite de camaras opticas de cobertura 360 grados con vision de profundidad que permite el movimiento en 360 grados (RGEN-20, RGEN-22) */
+        attribute visionProfundidad360 : Boolean;
         port puertoVideo : PuertoVideoOptico;
+        port salidaVideoComms : DataBusPort;
+    }
+
+    part def CamaraLateralImplementos {
+        doc /* Camara lateral independiente que proporciona informacion de los implementos y vision lateral del estado del UGV (RGEN-22) */
+        port puertoVideo : PuertoVideoOptico;
+        port salidaVideoComms : DataBusPort;
     }
 
     part def CamaraTermicaNocturna {
-        doc /* Camara termica e infrarroja para vision nocturna (RGEN-22) */
+        doc /* Camara termica e infrarroja para vision nocturna que tiene como objetivo identificar puntos calientes (RGEN-22) */
+        attribute identificaPuntosCalientes : Boolean;
         port puertoVideo : PuertoVideoOptico;
+        port salidaVideoComms : DataBusPort;
+    }
+
+    part def TransductoresContactoDinamicos {
+        doc /* Sensores fisicos de transductores de contacto y dinamicos que proporcionan informacion en tiempo real del estado del tren de rodaje (RGEN-22) */
+        port salidaEstadoRodaje : DataBusPort;
+    }
+
+    part def SubsistemaCamaras {
+        doc /* Subparte que agrupa todas las camaras y medios de video para vision por computador y teleoperacion desde Comunicaciones (RGEN-20, RGEN-22) */
+        part camarasOpticas360 : CamarasOpticas360;                 // Cobertura 360 grados con vision de profundidad (RGEN-20, RGEN-22)
+        part camaraLateralIzquierda : CamaraLateralImplementos;     // Vision lateral izquierda e implementos (RGEN-22)
+        part camaraLateralDerecha : CamaraLateralImplementos;       // Vision lateral derecha e implementos (RGEN-22)
+        part camaraTermicaNocturna : CamaraTermicaNocturna;         // Vision nocturna e identificacion de puntos calientes (RGEN-22)
+
+        port salidaOptica : PuertoVideoOptico;
+        port salidaTermica : PuertoVideoOptico;
+        port salidaVideoTeleoperacion : DataBusPort;
+
+        // Enlaces hacia el sistema de vision por computador (exterior a camaras)
+        binding c_optica360_vision bind camarasOpticas360.puertoVideo = salidaOptica;
+        binding c_lat_izq_vision bind camaraLateralIzquierda.puertoVideo = salidaOptica;
+        binding c_lat_der_vision bind camaraLateralDerecha.puertoVideo = salidaOptica;
+        binding c_termica_vision_out bind camaraTermicaNocturna.puertoVideo = salidaTermica;
+
+        // Concentracion de toda la informacion de video hacia el puerto de teleoperacion para Comunicaciones (RGEN-22)
+        connection c_video360_comms connect camarasOpticas360.salidaVideoComms to salidaVideoTeleoperacion;
+        connection c_video_izq_comms connect camaraLateralIzquierda.salidaVideoComms to salidaVideoTeleoperacion;
+        connection c_video_der_comms connect camaraLateralDerecha.salidaVideoComms to salidaVideoTeleoperacion;
+        connection c_video_termica_comms connect camaraTermicaNocturna.salidaVideoComms to salidaVideoTeleoperacion;
+    }
+
+    part def SubsistemaSensores {
+        doc /* Subparte que agrupa LiDAR, radar y los transductores de contacto y dinamicos del tren de rodaje (RGEN-09, RGEN-22) */
+        part sensoresLidar : SensorLidar;                           // Tecnologia radiante desactivable en modo sigiloso (RGEN-09)
+        part sensoresRadar : SensorRadar;                           // Tecnologia radiante desactivable en modo sigiloso (RGEN-09)
+        part transductoresRodaje : TransductoresContactoDinamicos;  // Supervision en tiempo real del estado del tren de rodaje (RGEN-22)
+
+        port salidaLidar : PuertoDatosLidar;
+        port salidaRadar : PuertoDatosRadar;
+        port controlModoDeteccion : DataBusPort;
+        port salidaEstadoRodaje : DataBusPort;
+
+        // Enlaces de salida de percepcion radiante y estado de rodaje
+        binding c_lidar_out bind sensoresLidar.puertoLidar = salidaLidar;
+        binding c_radar_out bind sensoresRadar.puertoRadar = salidaRadar;
+        connection c_rodaje_out connect transductoresRodaje.salidaEstadoRodaje to salidaEstadoRodaje;
+
+        // Distribucion de la orden de apagado/encendido en modo sigiloso a LiDAR y radar (RGEN-09)
+        connection c_modo_lidar connect controlModoDeteccion to sensoresLidar.controlModoDeteccion;
+        connection c_modo_radar connect controlModoDeteccion to sensoresRadar.controlModoDeteccion;
     }
 
     part def OdometriaVisualInercialVIO {
@@ -161,22 +225,26 @@ package SubsistemaNavegacion {
         require constraint { true }
     }
 
+    requirement def ReqConcienciaSituacionalVisionSensores {
+        subject nav : SistemaNavegacion;
+        doc /* El UGV dispondra de medios de captacion de imagen y sensores que aporten conciencia situacional, faciliten la teleoperacion y el trabajo con implementos, incluyendo visualizacion de implementos y estado del tren de rodaje mediante transductores de contacto y dinamicos, imagenes independientes de cada lateral, vision de profundidad en 360 grados y camara termica que identifique puntos calientes (RGEN-22). */
+        require constraint { true }
+    }
+
     // --- Bloque Principal del Subsistema 4.2 de Navegacion ---
     part def SistemaNavegacion {
-        doc /* Ensamblaje de sensores radiantes, no radiantes, fusion de obstaculos y odometria VIO (RGEN-09, RNAV-01, ROPE-06) */
+        doc /* Ensamblaje de las subpartes camaras y sensores, sistema de vision por computador, fusion de obstaculos y odometria VIO (RGEN-09, RNAV-01, ROPE-06, RGEN-20, RGEN-22) */
         attribute modoDeteccionActual : ModoDeteccionObstaculos;
         attribute tecnologiasRadiantesActivas : Boolean;
 
-        // Modulos de fusion de obstaculos y posicionamiento inercial-visual
+        // Subpartes de camaras y sensores (RGEN-09, RGEN-20, RGEN-22)
+        part camaras : SubsistemaCamaras;                             // Agrupa camaras 360 con profundidad, 2 laterales y termica de puntos calientes (RGEN-20, RGEN-22)
+        part sensores : SubsistemaSensores;                           // Agrupa LiDAR, radar y transductores de contacto y dinamicos de rodaje (RGEN-09, RGEN-22)
+
+        // Sistema de vision por computador (fuera de camaras), fusion de obstaculos y posicionamiento inercial-visual
+        part sistemaVisionComputador : SistemaVisionComputador;       // Tecnologia no radiante pasiva de vision por computador (RGEN-09)
         part moduloDeteccionEvasion : ModuloDeteccionEvasion;         // Detect & Avoid en tiempo real (ROPE-06, RGEN-09)
         part odometriaVisualInercialVIO : OdometriaVisualInercialVIO; // Posicionamiento en GNSS denegado (RNAV-01)
-
-        // Sensores de percepcion situacional y deteccion de obstaculos (RGEN-09)
-        part camarasOpticas360 : CamarasOpticas360;                   // Cobertura visual 360 grados (RGEN-20)
-        part camaraTermicaNocturna : CamaraTermicaNocturna;           // Deteccion termica e infrarroja (RGEN-22)
-        part sensoresLidar : SensorLidar;                             // Tecnologia radiante desactivable en modo sigiloso (RGEN-09)
-        part sensoresRadar : SensorRadar;                             // Tecnologia radiante desactivable en modo sigiloso (RGEN-09)
-        part sistemaVisionComputador : SistemaVisionComputador;       // Tecnologia no radiante pasiva de vision por computador (RGEN-09)
 
         // Puertos externos del subsistema hacia la plataforma UGV, Comunicaciones y el Subsistema 4.1 de Control
         port chassisMount : MechanicalMountPort;
@@ -184,17 +252,22 @@ package SubsistemaNavegacion {
         port salidaObstaculos : PuertoMapaObstaculos;
         port salidaOdometria : PuertoOdometriaVIO;
         port entradaModoDeteccion : DataBusPort;
+        port salidaVideoTeleoperacion : DataBusPort;
+        port salidaEstadoRodaje : DataBusPort;
 
-        // Conexiones internas de sensores radiantes y no radiantes hacia deteccion de obstaculos (RGEN-09)
-        connection c_lidar_deteccion connect sensoresLidar.puertoLidar to moduloDeteccionEvasion.entradaLidar;
-        connection c_radar_deteccion connect sensoresRadar.puertoRadar to moduloDeteccionEvasion.entradaRadar;
+        // Conexiones internas desde sensores y vision por computador hacia deteccion de obstaculos (RGEN-09, RGEN-22)
+        connection c_lidar_deteccion connect sensores.salidaLidar to moduloDeteccionEvasion.entradaLidar;
+        connection c_radar_deteccion connect sensores.salidaRadar to moduloDeteccionEvasion.entradaRadar;
         connection c_vision_deteccion connect sistemaVisionComputador.puertoVision to moduloDeteccionEvasion.entradaVision;
-        connection c_camaras360_vision connect camarasOpticas360.puertoVideo to sistemaVisionComputador.entradaOptica;
-        connection c_termica_vision connect camaraTermicaNocturna.puertoVideo to sistemaVisionComputador.entradaTermica;
+        connection c_camaras_optica_vision connect camaras.salidaOptica to sistemaVisionComputador.entradaOptica;
+        connection c_camaras_termica_vision connect camaras.salidaTermica to sistemaVisionComputador.entradaTermica;
 
-        // Conexiones de apagado/encendido de LiDAR y radar desde el puerto de modo de deteccion (RGEN-09)
-        connection c_modo_lidar connect entradaModoDeteccion to sensoresLidar.controlModoDeteccion;
-        connection c_modo_radar connect entradaModoDeteccion to sensoresRadar.controlModoDeteccion;
+        // Conexion de apagado/encendido de LiDAR y radar hacia la subparte sensores (RGEN-09)
+        connection c_modo_sensores connect entradaModoDeteccion to sensores.controlModoDeteccion;
+
+        // Conexiones internas de video de camaras y estado de rodaje hacia los puertos de contorno para Comunicaciones (RGEN-22)
+        connection c_video_teleop_interno connect camaras.salidaVideoTeleoperacion to salidaVideoTeleoperacion;
+        connection c_estado_rodaje_interno connect sensores.salidaEstadoRodaje to salidaEstadoRodaje;
 
         // Conexiones internas hacia los puertos de contorno que enlazan con SubsistemaControl
         binding c_salida_obstaculos_interno bind moduloDeteccionEvasion.salidaObstaculos = salidaObstaculos;

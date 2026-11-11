@@ -15,6 +15,8 @@ package SubsistemaComunicaciones {
         port dataBus : DataBusPort;
         port salidaModoDeteccion : DataBusPort;
         port salidaInhabilitacionFrenado : DataBusPort;
+        port entradaVideoTeleoperacion : DataBusPort;
+        port entradaEstadoRodaje : DataBusPort;
         port rfPortBLOS : RFPort;
         port rfPortLOS : RFPort;
     }
