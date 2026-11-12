@@ -1,5 +1,5 @@
 package SubsistemaBarcaza {
-    doc /* Definicion del bastidor estructural y barcaza comun del UGV (RGEN-02..05, RLT1-06) */
+    doc /* Definicion del bastidor estructural y barcaza comun del UGV (RGEN-03, RGEN-10, RGEN-23/26, RLT1-06) */
     private import ScalarValues::*;
     private import TiposBase::*;
 
@@ -11,12 +11,12 @@ package SubsistemaBarcaza {
     }
 
     part def CabestranteAutoRecuperacion {
-        doc /* Sistema de traccion mecanica motorizada para auto-rescate en pendientes y terreno farragoso (RGEN-04) */
+        doc /* Sistema de traccion mecanica motorizada para auto-rescate en pendientes y terreno farragoso (RGEN-23, RGEN-26) */
         attribute capacidadTiroKN : Real;
     }
 
     part def GanchoRemolqueSTANAG {
-        doc /* Dispositivo de enganche y recuperacion normalizado militar compatible STANAG 4101 (RGEN-05) */
+        doc /* Dispositivo de enganche y recuperacion normalizado militar compatible STANAG 4101 para arrastre >= 3000 kg (RGEN-10) */
         attribute normaSTANAG : String;
     }
 
@@ -24,32 +24,32 @@ package SubsistemaBarcaza {
 
     requirement def ReqBarcazaComun {
         subject barcaza : BarcazaEstructural;
-        doc /* La plataforma debe basarse en una arquitectura de barcaza comun y modular para toda la familia de variantes (RGEN-02). */
+        doc /* La plataforma debe basarse en una arquitectura de barcaza comun y modular para toda la familia de variantes del lote (RGEN-03). */
         require constraint { true }
     }
 
     requirement def ReqProteccionCascoEnV {
         subject chasis : ChasisProtegidoEnV;
-        doc /* El chasis inferior debe incorporar geometria en V para desviar la onda de choque de minas e IEDs (RGEN-03). */
+        doc /* El chasis inferior debe incorporar geometria en V para desviar la onda de choque de minas e IEDs. */
         require constraint { chasis.nivelProteccionSTANAG >= 1 }
     }
 
     requirement def ReqCabestranteAutoRecuperacion {
         subject cabestrante : CabestranteAutoRecuperacion;
-        doc /* Capacidad de auto-recuperacion del vehiculo mediante cabestrante motorizado (RGEN-04). */
+        doc /* Capacidad de auto-recuperacion del vehiculo mediante cabestrante motorizado y puntos de anclaje con eslingas (RGEN-23, RGEN-26). */
         require constraint { cabestrante.capacidadTiroKN >= 50.0 }
     }
 
     requirement def ReqGanchoSTANAG4101 {
         subject gancho : GanchoRemolqueSTANAG;
-        doc /* Puntos de anclaje de remolque compatibles con el estandar militar STANAG 4101 (RGEN-05). */
+        doc /* Puntos de anclaje de remolque compatibles con el estandar militar STANAG 4101 para arrastre >= 3000 kg (RGEN-10). */
         require constraint { true }
     }
 
     requirement def ReqMasaTaraPlataforma {
         subject barcaza : BarcazaEstructural;
-        doc /* La masa en vacio o tara de la plataforma con ruedas debe situarse entre 3500 y 5000 kg (RLT1-06). */
-        require constraint { barcaza.masa >= 3500.0 and barcaza.masa <= 5000.0 }
+        doc /* La masa en vacio o tara de la plataforma con ruedas debe situarse entre 3500 y 7000 kg (RLT1-06, Anexo I §3.2.1). */
+        require constraint { barcaza.masa >= 3500.0 and barcaza.masa <= 7000.0 }
     }
 
     // --- Subsistema de Barcaza Principal ---

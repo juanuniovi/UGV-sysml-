@@ -68,10 +68,11 @@ rules:
     - Explicar el problema, el objetivo, el alcance y lo que queda fuera del cambio.
     - Identificar todos los archivos y subsistemas previsiblemente afectados.
     - Enumerar los requisitos del pliego relacionados y señalar cualquier posible conflicto.
+    - Auditar y contrastar contra el pliego oficial en docs/ cualquier cita literal o rango numérico de requisitos RGEN/RLT1/ROPE/RCOM/RNAV, prohibiendo la asunción ciega de valores de maquetas previas.
     - Si se modifica un requisito existente, registrar la confirmación explícita del usuario y justificar el cambio.
   specs:
     - Redactar requisitos observables, inequívocos y verificables, conservando SHALL/MUST donde lo exija OpenSpec.
-    - Mantener la trazabilidad con los identificadores RGEN, RLT1, RNAV, ROPE o RCOM aplicables.
+    - Mantener la trazabilidad con los identificadores RGEN, RLT1, RNAV, ROPE o RCOM aplicables y verificar que los rangos numéricos concuerdan con la fuente contractual oficial (o documentarlos explícitamente como derivados si son más restrictivos).
     - No incluir requisitos MODIFIED o REMOVED sin confirmación explícita previa del usuario.
   design:
     - Justificar las decisiones de arquitectura y la sintaxis SysML v2 elegida.
