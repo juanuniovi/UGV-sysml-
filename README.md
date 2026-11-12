@@ -25,7 +25,7 @@ El modelo se distribuye en **11 archivos independientes** (8 de subcomponentes y
 ```text
 Modelos/
 ├── 00_tipos_base.sysml          <- Magnitudes físicas (Masa, Potencia) y puertos estándar (Mecánico, Potencia, Bus, RF)
-├── 01_barcaza.sysml             <- Barcaza estructural, chasis en V, cabestrante y puntos de anclaje (RGEN-02..05)
+├── 01_barcaza.sysml             <- Barcaza estructural, chasis en V, cabestrante y anclajes (RGEN-03, RGEN-10, RGEN-23/26, RLT1-06)
 ├── 02_tren_rodaje.sysml         <- Tren de ruedas independientes, suspensión regulable y servodirección (RLT1-01..05)
 ├── 03_planta_motriz.sysml       <- Planta híbrida: biocombustible 100%, baterías silenciosas y exportación 120kW (RGEN-11..19)
 ├── 04_navegacion_control.sysml  <- Cerebro GNC: autonomía waypoints, Follow-Me, Detect & Avoid y sensores 360° (ROPE, RNAV)
@@ -60,3 +60,11 @@ El archivo [`09_sistema_ugv.sysml`](Modelos/09_sistema_ugv.sysml) orquesta las t
   
 
 ---
+
+## 4. Control de Cambios y Trazabilidad de Requisitos
+
+* **Actualización en Barcaza y Chasis (`01_barcaza.sysml`, Issue #20)**:
+  * **Tara de plataforma (`RLT1-06`)**: Corregido el límite superior a **7.000 kg** (`barcaza.masa <= 7000.0`) según el pliego oficial (CDTI Anexo I §3.2.1).
+  * **Identificadores del pliego**: Regularizados a `RGEN-03` (barcaza común), `RGEN-10` (remolque STANAG 4101 $\ge 3.000\text{ kg}$) y `RGEN-23/26` (eslingas y cabestrante de autorrecuperación).
+  * **Política de auditoría anti-arrastre**: Incorporada regla en `AGENTS.md` que obliga a contrastar todo requisito contractual directamente con las fuentes primarias de `docs/` antes de consolidar especificaciones.
+
