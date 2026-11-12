@@ -105,4 +105,35 @@ package VistasUGV {
         doc /* Muestra la topología de interconexiones del Subsistema de Comunicaciones Embarcado (RCOM-01) */
         expose SubsistemaComunicaciones::SistemaComunicacionesEmbarcado;
     }
+
+    // Vista 10: Interconexiones internas de la Planta Motriz Hibrida (equivalente a IBD)
+    view vistaConexionesPlantaMotriz : InterconnectionView {
+        doc /* Muestra los bloques generales de la planta motriz hibrida serie y sus flujos internos de combustible, eje mecanico, potencia electrica y datos de gestion del PMS (RGEN-11, RGEN-13, RGEN-19, RLT1-09) */
+        expose SubsistemaPlantaMotriz::PlantaMotrizHibrida;
+    }
+
+    // Vista 11: Estructura de la Planta Motriz Hibrida (equivalente a BDD)
+    view vistaEstructuraPlantaMotriz : GeneralView {
+        doc /* Muestra la jerarquia de bloques generales de la planta motriz hibrida y sus puertos */
+        expose SubsistemaPlantaMotriz::*;
+        filter @SysML::PartUsage or @SysML::PartDefinition
+            or @SysML::PortUsage or @SysML::PortDefinition;
+    }
+
+    // Vista 12: Planta Motriz integrada con los subsistemas que alimenta (equivalente a IBD)
+    view vistaConexionesPlantaMotrizSistema : InterconnectionView {
+        doc /* Muestra la planta motriz junto con control, navegacion, comunicaciones, carga de pago y UAV, y las conexiones de potencia y datos entre ellos. El montaje en barcaza (c_barcaza_powertrain) y la traccion hacia el tren de rodaje (c_power_traction) se muestran en vistaConexionesPlataforma */
+        expose SistemaUGV::PlataformaUGV::plantaMotriz;
+        expose SistemaUGV::PlataformaUGV::control;
+        expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::c_power_control;
+        expose SistemaUGV::PlataformaUGV::c_power_navegacion;
+        expose SistemaUGV::PlataformaUGV::c_power_comms;
+        expose SistemaUGV::PlataformaUGV::c_pms_control;
+        expose SistemaUGV::SistemaUGVPesadoDual::cargaPagoMision;
+        expose SistemaUGV::SistemaUGVPesadoDual::uavCenital;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_payload_power;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_uav_power;
+    }
 }
