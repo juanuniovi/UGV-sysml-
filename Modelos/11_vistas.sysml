@@ -12,6 +12,7 @@ package VistasUGV {
     private import SubsistemaEstacionesControl::*;
     private import SubsistemaUAVCenital::*;
     private import SubsistemaCargasPago::*;
+    private import SubsistemaIluminacion::*;
     private import SistemaUGV::*;
     private import ComportamientoUGV::*;
 
@@ -56,6 +57,7 @@ package VistasUGV {
         expose SubsistemaEstacionesControl::*;
         expose SubsistemaUAVCenital::*;
         expose SubsistemaCargasPago::*;
+        expose SubsistemaIluminacion::*;
         expose SistemaUGV::*;
         filter @SysML::RequirementDefinition
             or @SysML::RequirementUsage
@@ -127,9 +129,11 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::control;
         expose SistemaUGV::PlataformaUGV::navegacion;
         expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::iluminacion;
         expose SistemaUGV::PlataformaUGV::c_power_control;
         expose SistemaUGV::PlataformaUGV::c_power_navegacion;
         expose SistemaUGV::PlataformaUGV::c_power_comms;
+        expose SistemaUGV::PlataformaUGV::c_power_iluminacion;
         expose SistemaUGV::PlataformaUGV::c_pms_control;
         expose SistemaUGV::SistemaUGVPesadoDual::cargaPagoMision;
         expose SistemaUGV::SistemaUGVPesadoDual::uavCenital;
