@@ -1,0 +1,24 @@
+# Spec Delta: subsistema-iluminacion
+
+## MODIFIED Requirements
+
+### Requirement: Estructura del Subsistema 4.3 de Iluminación y subparte de iluminación 360° (RGEN-20)
+El modelo SHALL definir en `Modelos/04_3_iluminacion.sysml` el paquete `SubsistemaIluminacion` con el bloque principal `SistemaIluminacion`, integrando directamente los atributos de iluminación perimetral en 360 grados (`anguloCoberturaDeg : Real = 360.0`, `potenciaConsumoWatts : Potencia`, `alcanceEfectivoMetros : Longitud`), sin subpartes intermedias redundantes que generen duplicidad en vistas, y con puertos de potencia (`powerInput : ElectricalPowerPort`), fijación mecánica (`chassisMount : MechanicalMountPort`) y enlace con comunicaciones (`dataBus : DataBusPort`).
+
+#### Scenario: Composición interna de SistemaIluminacion
+- **WHEN** se inspecciona la estructura de `SubsistemaIluminacion::SistemaIluminacion`
+- **THEN** contiene directamente los atributos de cobertura 360° sin instanciar subpartes duplicadas de iluminación, y expone los puertos `chassisMount`, `powerInput` y `dataBus`
+
+### Requirement: Acción de iluminación 360 grados
+El bloque `SistemaIluminacion` SHALL ejecutar la acción `Iluminar360Grados` (`iluminar360Grados`), la cual comanda y activa directamente la emisión lumínica perimetral en 360 grados del subsistema de iluminación.
+
+#### Scenario: Activación de la iluminación 360 grados
+- **WHEN** se ejecuta la acción `iluminar360Grados`
+- **THEN** se modula la salida de emisión perimetral activa en 360 grados para dar apoyo visual al UGV
+
+### Requirement: Trazabilidad formal del requisito RGEN-20 y satisfacción por SistemaIluminacion
+El paquete `SubsistemaIluminacion` SHALL definir el requisito trazable `ReqConscienciaSituacionalIluminacion360` (`RGEN-20`), estableciendo `subject ilum : SistemaIluminacion` y una relación formal de satisfacción directa dentro de `SistemaIluminacion`, sin delegar en subpartes huérfanas.
+
+#### Scenario: Verificación de trazabilidad del requisito RGEN-20
+- **WHEN** se examinan los requisitos del subsistema de iluminación en Spec42 o en `vistaRequisitos`
+- **THEN** `ReqConscienciaSituacionalIluminacion360` aparece vinculado y satisfecho formalmente por el bloque `SistemaIluminacion` bajo la referencia `RGEN-20`

@@ -3,14 +3,6 @@ package SubsistemaIluminacion {
     private import ScalarValues::*;
     private import TiposBase::*;
 
-    // --- Subparte de Iluminacion 360 Grados (RGEN-20) ---
-    part def Iluminacion360 {
-        doc /* Subparte de iluminacion perimetral en 360 grados para apoyo visual y consciencia situacional (RGEN-20) */
-        attribute anguloCoberturaDeg : Real = 360.0;
-        attribute potenciaConsumoWatts : Potencia;
-        attribute alcanceEfectivoMetros : Longitud;
-    }
-
     // --- Accion de Iluminacion 360 Grados (RGEN-20) ---
     action def Iluminar360Grados {
         doc /* Accion de activacion y emision luminica perimetral en 360 grados (RGEN-20) */
@@ -28,8 +20,10 @@ package SubsistemaIluminacion {
     part def SistemaIluminacion {
         doc /* Ensamblaje del subsistema de iluminacion perimetral del UGV (RGEN-20) */
 
-        // Subparte de iluminacion 360 (RGEN-20)
-        part iluminacion360 : Iluminacion360; // Subparte de iluminacion perimetral 360 grados (RGEN-20)
+        // Atributos de iluminacion perimetral 360 grados (RGEN-20)
+        attribute anguloCoberturaDeg : Real = 360.0;
+        attribute potenciaConsumoWatts : Potencia;
+        attribute alcanceEfectivoMetros : Longitud;
 
         // Puertos externos hacia la plataforma UGV y comunicaciones
         port chassisMount : MechanicalMountPort;
@@ -40,6 +34,6 @@ package SubsistemaIluminacion {
         perform action iluminar360Grados : Iluminar360Grados;
 
         // Satisfaccion formal de requisitos
-        satisfy requirement : ReqConscienciaSituacionalIluminacion360 by iluminacion360;
+        satisfy requirement : ReqConscienciaSituacionalIluminacion360;
     }
 }
