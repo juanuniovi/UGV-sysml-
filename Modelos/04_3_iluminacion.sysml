@@ -3,6 +3,17 @@ package SubsistemaIluminacion {
     private import ScalarValues::*;
     private import TiposBase::*;
 
+    // --- Items y Puertos de Control de Intensidad (ROPE-01, ROPE-02, RGEN-20) ---
+    item def Intensidad {
+        doc /* Item de consigna de intensidad luminica perimetral (0.0 a 100.0 %) comandada por el sistema de control */
+        attribute nivelPorcentaje : Real;
+    }
+
+    port def PuertoIntensidadIluminacion {
+        doc /* Puerto de envio de consigna de intensidad luminica */
+        out item intensidad : Intensidad;
+    }
+
     // --- Accion de Iluminacion 360 Grados (RGEN-20) ---
     action def Iluminar360Grados {
         doc /* Accion de activacion y emision luminica perimetral en 360 grados (RGEN-20) */
@@ -25,10 +36,11 @@ package SubsistemaIluminacion {
         attribute potenciaConsumoWatts : Potencia;
         attribute alcanceEfectivoMetros : Longitud;
 
-        // Puertos externos hacia la plataforma UGV y comunicaciones
+        // Puertos externos hacia la plataforma UGV, control y alimentacion
         port chassisMount : MechanicalMountPort;
         port powerInput : ElectricalPowerPort;
-        port dataBus : DataBusPort; // Enlace directo con el bus de comunicaciones
+        port dataBus : DataBusPort; // Enlace con el bus de comunicaciones embarcado
+        port entradaIntensidad : ~PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
 
         // Accion local de iluminacion perimetral 360 grados
         perform action iluminar360Grados : Iluminar360Grados;

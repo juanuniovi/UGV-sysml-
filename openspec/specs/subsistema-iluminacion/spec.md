@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Especifica la arquitectura interna, bloques tipados, puertos, conexiones, acciones, requisitos y vistas del subsistema **4.3 Iluminación** (`SubsistemaIluminacion` en `Modelos/04_3_iluminacion.sysml`), encargado de proporcionar soporte lumínico perimetral en 360 grados para garantizar la consciencia situacional nocturna y en baja visibilidad (`RGEN-20`), conectado con el subsistema de Comunicaciones e integrado en `PlataformaUGV`.
+Especifica la arquitectura interna, bloques tipados, puertos, conexiones, acciones, requisitos y vistas del subsistema **4.3 Iluminación** (`SubsistemaIluminacion` en `Modelos/04_3_iluminacion.sysml`), encargado de proporcionar soporte lumínico perimetral en 360 grados para garantizar la consciencia situacional nocturna y en baja visibilidad (`RGEN-20`), conectado con el subsistema de Control para gobierno de intensidad e integrado en `PlataformaUGV`.
 
 ## Requirements
 
 ### Requirement: Estructura del Subsistema 4.3 de Iluminación y subparte de iluminación 360° (RGEN-20)
-El modelo SHALL definir en `Modelos/04_3_iluminacion.sysml` el paquete `SubsistemaIluminacion` con el bloque principal `SistemaIluminacion`, integrando directamente los atributos de iluminación perimetral en 360 grados (`anguloCoberturaDeg : Real = 360.0`, `potenciaConsumoWatts : Potencia`, `alcanceEfectivoMetros : Longitud`), sin subpartes intermedias redundantes que generen duplicidad en vistas, y con puertos de potencia (`powerInput : ElectricalPowerPort`), fijación mecánica (`chassisMount : MechanicalMountPort`) y enlace con comunicaciones (`dataBus : DataBusPort`).
+El modelo SHALL definir en `Modelos/04_3_iluminacion.sysml` el paquete `SubsistemaIluminacion` con el bloque principal `SistemaIluminacion`, definiendo el ítem de datos `item def Intensidad` y el puerto tipado `port def PuertoIntensidadIluminacion { out item intensidad : Intensidad; }`, integrando directamente en `SistemaIluminacion` los atributos de iluminación perimetral en 360 grados (`anguloCoberturaDeg : Real = 360.0`, `potenciaConsumoWatts : Potencia`, `alcanceEfectivoMetros : Longitud`), con puertos de potencia (`powerInput : ElectricalPowerPort`), fijación mecánica (`chassisMount : MechanicalMountPort`) y el puerto receptor de intensidad (`entradaIntensidad : ~PuertoIntensidadIluminacion`).
 
 #### Scenario: Composición interna de SistemaIluminacion
 - **WHEN** se inspecciona la estructura de `SubsistemaIluminacion::SistemaIluminacion`
-- **THEN** contiene directamente los atributos de cobertura 360° sin instanciar subpartes duplicadas de iluminación, y expone los puertos `chassisMount`, `powerInput` y `dataBus`
+- **THEN** contiene directamente los atributos de cobertura 360°, y expone los puertos `chassisMount`, `powerInput` y `entradaIntensidad`
 
 ### Requirement: Acción de iluminación 360 grados
 El bloque `SistemaIluminacion` SHALL ejecutar la acción `Iluminar360Grados` (`iluminar360Grados`), la cual comanda y activa directamente la emisión lumínica perimetral en 360 grados del subsistema de iluminación.
@@ -28,8 +28,8 @@ El paquete `SubsistemaIluminacion` SHALL definir el requisito trazable `ReqConsc
 - **THEN** `ReqConscienciaSituacionalIluminacion360` aparece vinculado y satisfecho formalmente por el bloque `SistemaIluminacion` bajo la referencia `RGEN-20`
 
 ### Requirement: Integración de SistemaIluminacion en PlataformaUGV con enlace a Comunicaciones
-El modelo SHALL integrar `part iluminacion : SistemaIluminacion;` dentro de `PlataformaUGV` (`Modelos/09_sistema_ugv.sysml`), conectando sus puertos con la barcaza (`c_barcaza_iluminacion`), la planta motriz para suministro de energía (`c_power_iluminacion`) y directamente con el bus de comunicaciones (`c_comms_iluminacion connect comunicaciones.dataBus to iluminacion.dataBus;`), y exponiendo el paquete `SubsistemaIluminacion` en `Modelos/11_vistas.sysml` dentro de `vistaRequisitos` y `vistaConexionesPlantaMotrizSistema`.
+El modelo SHALL integrar `part iluminacion : SistemaIluminacion;` dentro de `PlataformaUGV` (`Modelos/09_sistema_ugv.sysml`), conectando sus puertos con la barcaza (`c_barcaza_iluminacion`), la planta motriz para suministro de energía (`c_power_iluminacion`) y directamente con el subsistema de Control para el gobierno de intensidad (`c_control_iluminacion connect control.salidaIntensidad to iluminacion.entradaIntensidad;`), y exponiendo la conexión en `Modelos/11_vistas.sysml` dentro de `vistaEstructuraNavegacionControl` y `vistaConexionesNavegacionControl`.
 
 #### Scenario: Conexión con comunicaciones y planta motriz en PlataformaUGV
 - **WHEN** se instancia `PlataformaUGV` en `SistemaUGV`
-- **THEN** `iluminacion.dataBus` está conectado a `comunicaciones.dataBus` (`c_comms_iluminacion`), `iluminacion.powerInput` a `plantaMotriz.powerOutputAvionics` (`c_power_iluminacion`) y `iluminacion.chassisMount` a `barcaza.avionicaMount` (`c_barcaza_iluminacion`)
+- **THEN** `iluminacion.entradaIntensidad` está conectado a `control.salidaIntensidad` (`c_control_iluminacion`), `iluminacion.powerInput` a `plantaMotriz.powerOutputAvionics` (`c_power_iluminacion`) y `iluminacion.chassisMount` a `barcaza.avionicaMount` (`c_barcaza_iluminacion`)

@@ -3,6 +3,7 @@ package SubsistemaControl {
     private import ScalarValues::*;
     private import TiposBase::*;
     private import SubsistemaNavegacion::*;
+    private import SubsistemaIluminacion::*;
 
     // --- Items de Consignas de Control, Estado Unificado y Supervision ROS 2 (ROPE-05, ROPE-06, RGEN-17) ---
     item def MapaEstadoUnificado {
@@ -59,13 +60,14 @@ package SubsistemaControl {
     }
 
     part def SubsistemaPlanificacionEvaluacion {
-        doc /* Evalua si existe riesgo de colision a partir del mapa unificado y genera las consignas de conduccion y frenado (ROPE-05, ROPE-06, RGEN-17) */
+        doc /* Evalua si existe riesgo de colision a partir del mapa unificado, genera las consignas de conduccion y frenado, y modula la intensidad luminica gobernada por el modo activo (ROPE-01, ROPE-02, ROPE-05, ROPE-06, RGEN-17) */
         attribute consignasHabilitadas : Boolean;
         port entradaMapaUnificado : ~PuertoMapaEstadoUnificado;
         port busComunicaciones : DataBusPort;
         port entradaControlModo : DataBusPort;
         port salidaSalud : PuertoLatidoSalud;
         port salidaConsigna : PuertoConsignaAutonomia;
+        port salidaIntensidad : PuertoIntensidadIluminacion;
     }
 
     part def SupervisorSeguridad {
@@ -91,6 +93,7 @@ package SubsistemaControl {
         port entradaObstaculos : ~PuertoMapaObstaculos;
         port entradaOdometria : ~PuertoOdometriaVIO;
         port salidaConsigna : PuertoConsignaAutonomia;
+        port salidaIntensidad : PuertoIntensidadIluminacion;
         port busComunicaciones : DataBusPort;
         port entradaHabilitacionConsignas : DataBusPort;
 
@@ -100,6 +103,7 @@ package SubsistemaControl {
         binding b_plan_comms bind busComunicaciones = subsistemaPlanificacionEvaluacion.busComunicaciones;
         binding b_plan_habilitacion bind entradaHabilitacionConsignas = subsistemaPlanificacionEvaluacion.entradaControlModo;
         binding b_plan_consigna bind subsistemaPlanificacionEvaluacion.salidaConsigna = salidaConsigna;
+        binding b_plan_intensidad bind subsistemaPlanificacionEvaluacion.salidaIntensidad = salidaIntensidad;
         binding b_watchdog_consigna bind supervisorSeguridad.salidaFrenadoWatchdog = salidaConsigna;
 
         // Conexiones internas entre los tres subsistemas ROS 2
@@ -160,6 +164,7 @@ package SubsistemaControl {
         port dataBus : DataBusPort;
         port entradaInhabilitacionFrenado : DataBusPort;
         port driveByWireOutput : DataBusPort;
+        port salidaIntensidad : PuertoIntensidadIluminacion;
 
         // Puertos de interfaz directa con el Subsistema 4.2 de Navegacion
         port entradaObstaculos : ~PuertoMapaObstaculos;
@@ -168,6 +173,7 @@ package SubsistemaControl {
         // Conexiones internas con los puertos de contorno hacia SubsistemaNavegacion
         binding c_entrada_obstaculos bind entradaObstaculos = computadorAutonomia.entradaObstaculos;
         binding c_entrada_vio bind entradaOdometria = computadorAutonomia.entradaOdometria;
+        binding b_ctrl_intensidad bind computadorAutonomia.salidaIntensidad = salidaIntensidad;
 
         // Conexion interna entre computador de autonomia y modulo de frenado de seguridad
         connection c_autonomia_frenado connect computadorAutonomia.salidaConsigna to moduloFrenadoSeguridad.entradaConsigna;

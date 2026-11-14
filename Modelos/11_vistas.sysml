@@ -84,7 +84,7 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_nav_video_comms;
         expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
-        expose SistemaUGV::PlataformaUGV::c_comms_iluminacion;
+        expose SistemaUGV::PlataformaUGV::c_control_iluminacion;
         filter @SysML::PartUsage or @SysML::PortUsage
             or @SysML::ConnectionUsage or @SysML::BindingConnectorAsUsage;
     }
@@ -103,7 +103,7 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_nav_video_comms;
         expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
-        expose SistemaUGV::PlataformaUGV::c_comms_iluminacion;
+        expose SistemaUGV::PlataformaUGV::c_control_iluminacion;
     }
 
     // Vista 9: Interconexiones del Subsistema de Comunicaciones (equivalente a IBD)
