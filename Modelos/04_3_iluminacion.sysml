@@ -10,8 +10,8 @@ package SubsistemaIluminacion {
     }
 
     port def PuertoIntensidadIluminacion {
-        doc /* Puerto de envio de consigna de intensidad luminica */
-        out item intensidad : Intensidad;
+        doc /* Puerto de gobierno y transmision de consigna de intensidad luminica perimetral */
+        item intensidad : Intensidad;
     }
 
     // --- Accion de Iluminacion 360 Grados (RGEN-20) ---
