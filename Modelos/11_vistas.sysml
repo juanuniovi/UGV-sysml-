@@ -102,7 +102,7 @@ package VistasUGV {
 
     // Vista 9: Interconexiones del Subsistema de Comunicaciones (equivalente a IBD)
     view vistaConexionesComunicaciones : InterconnectionView {
-        doc /* Muestra la topología de interconexiones del Subsistema de Comunicaciones Embarcado (RCOM-01) */
+        doc /* Muestra la topología de interconexiones del Subsistema de Comunicaciones Embarcado con radios LOS, BLOS, CNR, COMSEC, QoS y Watchdog (RCOM-01..03, RSW-06) */
         expose SubsistemaComunicaciones::SistemaComunicacionesEmbarcado;
     }
 }
