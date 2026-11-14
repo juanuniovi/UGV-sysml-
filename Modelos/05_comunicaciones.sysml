@@ -1,6 +1,8 @@
 package SubsistemaComunicaciones {
-    doc /* Sistema de comunicaciones tácticas embarcadas con arquitectura redundante Plan PACE,
-           gestión estricta de QoS, cifrado COMSEC y topología completa IBD (RCOM-01..03, RSW-06) */
+    doc /* Sistema de comunicaciones tácticas embarcadas del UGV pesado dual.
+           Implementa la arquitectura de redundancia Plan PACE (LOS, BLOS, Relé UAV y Radio Militar CNR),
+           gestión estricta de colas QoS (RSW-06), cifrado hardware COMSEC (RCOM-03), control de emisiones
+           sigilosas (RGEN-09), supervisión failsafe con parada de emergencia (RGEN-17) y antenas estancas a vadeo (RLT1-10). */
     private import ScalarValues::*;
     private import TiposBase::*;
 
@@ -12,11 +14,11 @@ package SubsistemaComunicaciones {
         attribute protocolo : String = "UDP + micro-DDS con FEC";
         attribute tasaRefrescoHz : Real = 50.0;
         attribute latenciaMaximaMs : Real = 20.0;
-        attribute prioridadQoS : Integer = 1; // Prioridad máxima en cola Expedited Forwarding
+        attribute prioridadQoS : Integer = 1; // Prioridad máxima en cola Expedited Forwarding (RSW-06)
     }
 
     item def TelemetriaVideoLOS {
-        doc /* Retransmisión de vídeo de conducción y cámaras panorámicas 360° hacia CPT y PMP */
+        doc /* Retransmisión de vídeo de conducción y cámaras panorámicas 360° hacia CPT y PMP (RGEN-20, RGEN-22) */
         attribute protocolo : String = "STANAG 4609 (H.265 / HEVC + KLV MISB ST 0601)";
         attribute resolucionNominal : String = "1080p @ 30 fps";
         attribute caudalEstimadoMbps : Real = 6.0;
@@ -24,7 +26,7 @@ package SubsistemaComunicaciones {
     }
 
     item def ComandoControlBLOS {
-        doc /* Órdenes C2 estructuradas de navegación autónoma, waypoints y misión procedentes del PMP */
+        doc /* Órdenes C2 estructuradas de navegación autónoma, waypoints y misión procedentes del PMP (ROPE-05) */
         attribute protocolo : String = "STANAG 4586 (Edición 4) / JAUS";
         attribute acuseReciboGarantizado : Boolean = true;
         attribute latenciaMaximaMs : Real = 150.0;
@@ -33,13 +35,13 @@ package SubsistemaComunicaciones {
 
     item def TrazaTacticaBMS {
         doc /* Mensajería Blue Force Tracking (BFT) y estado táctico hacia la red de combate del batallón */
-        attribute protocolo : String = "BMS-ET / MIP Militar";
+        attribute protocolo : String = "BMS-ET / SIMACET / MIP Militar";
         attribute bandaPortadora : String = "VHF Militar (30-88 MHz)";
         attribute prioridadQoS : Integer = 3;
     }
 
     item def HeartbeatEnlace {
-        doc /* Trama periódica de sincronización de latido para supervisión y disparo de failsafe RGEN-17 */
+        doc /* Trama periódica de sincronización de latido para supervisión y disparo de failsafe (RGEN-17) */
         attribute frecuenciaEnvioHz : Real = 5.0; // 1 pulso cada 200 ms
         attribute timeoutFailsafeMs : Real = 1000.0; // Disparo automático si se pierden 5 latidos
         attribute prioridadQoS : Integer = 1;
@@ -78,6 +80,7 @@ package SubsistemaComunicaciones {
         attribute protocoloTransporte : String = "Telegramas binarios BMS-ET con salto FHSS";
         attribute bandaOperacionVhfMhz : Real = 30.0; // Rango 30-88 MHz con difracción terrestre
         attribute saltoFrecuenciaActivo : Boolean = true;
+        attribute difraccionTerrestreActiva : Boolean = true;
         attribute politicaVideo : String = "Video 100% apagado (0 Mbps) para reservar canal al telemando";
 
         port rfPort : RFPort;
@@ -97,13 +100,16 @@ package SubsistemaComunicaciones {
     }
 
     part def GestorRedundanciaYQoS {
-        doc /* Planificador de colas QoS y máquina de estados de conmutación ante fallos Plan PACE (RSW-06) */
+        doc /* Planificador de colas QoS y máquina de estados de conmutación ante fallos Plan PACE (RSW-06, RGEN-09) */
         attribute planPACE_1_Principal : String = "1º Orden: Radio LOS 2.4 GHz (Consola CPT)";
         attribute planPACE_2_Alternativo : String = "2º Orden: Radio MANET BLOS (Puesto PMP)";
         attribute planPACE_3_Contingencia : String = "3º Orden: Relé Aéreo con Transpondedor UAV Cenital";
         attribute planPACE_4_RespaldoMilitar : String = "4º Orden: Radio Militar VHF CNR (PR4G/ESSOR)";
         attribute planPACE_5_Emergencia : String = "5º Orden: Heartbeat Timeout -> Frenado automático RGEN-17";
-        attribute tiempoHisteresisRetornoS : Real = 3.0; // Estabilidad ininterrumpida antes de retornar de canal
+        attribute tiempoHisteresisRetornoS : Real = 3.0; // Estabilidad requerida antes de volver al canal superior
+        attribute prioridadTelemando : Integer = 1;
+        attribute prioridadVideo : Integer = 4;
+        attribute soporteSilencioRadio : Boolean = true;
 
         port puertoBusEntrada : DataBusPort;
         port puertoVideoEntrada : DataBusPort;
@@ -135,32 +141,58 @@ package SubsistemaComunicaciones {
     }
 
     // =========================================================================
-    // 3. Requisitos Formales del Pliego Oficial (RCOM-01..03, RSW-06)
+    // 3. Requisitos Formales del Pliego Oficial Aplicables a Comunicaciones
     // =========================================================================
     requirement def ReqEnlaceTacticoLOS {
+        subject radio : RadioEnlaceTacticoLOS;
         doc /* El UGV debe disponer de un enlace de radiofrecuencia táctico en línea de vista (LOS)
-               con la Consola Portable de Operador (CPT) para telemando con latencia <= 100 ms (RCOM-01). */
-        require constraint { true }
+               con la Consola Portable de Operador (CPT) para telemando suave con latencia <= 100 ms
+               y alcance nominal >= 1.0 km (RCOM-01). */
+        require constraint { radio.latenciaMaximaMs <= 100.0 and radio.alcanceNominalKm >= 1.0 }
     }
 
     requirement def ReqEnlaceTacticoBLOS {
+        subject radio : RadioEnlaceTacticoBLOS;
         doc /* El UGV debe disponer de un enlace de radiofrecuencia táctico fuera de línea de vista (BLOS)
-               para control a larga distancia desde el Puesto de Mando (PMP) y compatibilidad de relé
+               para control a larga distancia desde el Puesto de Mando (PMP >= 5.0 km) y compatibilidad de relé
                aéreo a través del transpondedor del UAV cenital embarcado (RCOM-02). */
-        require constraint { true }
+        require constraint { radio.alcanceNominalKm >= 5.0 and radio.soporteReleUAV }
     }
 
     requirement def ReqSeguridadComunicacionesCOMSEC {
+        subject crypto : ModuloCifradoCOMSEC;
         doc /* El subsistema de comunicaciones debe implementar cifrado hardware militar punto a punto
-               (COMSEC), protección anti-jamming y salto ágil de frecuencia FHSS (RCOM-03). */
-        require constraint { true }
+               (COMSEC AES-256 GCM), protección anti-jamming y salto ágil de frecuencia FHSS (RCOM-03). */
+        require constraint { crypto.cifradoHardwareActivo and crypto.proteccionAntiJamming }
     }
 
     requirement def ReqProtocolosTacticosYQoS {
+        subject qos : GestorRedundanciaYQoS;
         doc /* Arquitectura de transporte y protocolos tácticos con calidad de servicio (QoS) estricta
                que priorice de forma no bloqueante las órdenes críticas de guiado y frenado frente a los
                flujos multimedia pesados de vídeo (RSW-06). */
-        require constraint { true }
+        require constraint { qos.prioridadTelemando < qos.prioridadVideo }
+    }
+
+    requirement def ReqControlEmisionesModoSigiloso {
+        subject qos : GestorRedundanciaYQoS;
+        doc /* Coordinación con el sistema de navegación para atenuar potencia de radiofrecuencia o
+               entrar en silencio radioeléctrico total al activarse el modo SIGILOSO (RGEN-09). */
+        require constraint { qos.soporteSilencioRadio }
+    }
+
+    requirement def ReqFailsafeEnlaceSeguridad {
+        subject watchdog : SupervisorEnlaceWatchdog;
+        doc /* Supervisión continua de latido de radio (heartbeat); si se pierde la señal por más de
+               1.000 ms, se dispara orden directa de frenado automático y parada segura en GNC (RGEN-17). */
+        require constraint { watchdog.timeoutFailsafeMs <= 1000.0 }
+    }
+
+    requirement def ReqEstanqueidadAntenasVadeo {
+        subject antenas : SistemaAntenasEmbarcado;
+        doc /* Resistencia del mástil y pasamuros de antena en techo ante climatología severa (MIL-STD-810H)
+               y vadeo en profundidad sin preparación previa de al menos 0,75 m (RLT1-10, RGEN-06). */
+        require constraint { antenas.estanqueidadVadeoM >= 0.75 }
     }
 
     // =========================================================================
@@ -207,10 +239,13 @@ package SubsistemaComunicaciones {
         connection c_watchdog_frenado connect supervisorEnlaceWatchdog.puertoDisparoFrenado to salidaInhabilitacionFrenado;
         connection c_modo_emisiones connect gestorRedundanciaYQoS.puertoControlEmisiones to salidaModoDeteccion;
 
-        // Trazabilidad formal del pliego: satisfacción de requisitos
+        // Trazabilidad formal del pliego oficial: satisfacción de requisitos cumplidos
         satisfy requirement : ReqEnlaceTacticoLOS by radioEnlaceTacticoLOS;
         satisfy requirement : ReqEnlaceTacticoBLOS by radioEnlaceTacticoBLOS;
         satisfy requirement : ReqSeguridadComunicacionesCOMSEC by moduloCifradoCOMSEC;
         satisfy requirement : ReqProtocolosTacticosYQoS by gestorRedundanciaYQoS;
+        satisfy requirement : ReqControlEmisionesModoSigiloso by gestorRedundanciaYQoS;
+        satisfy requirement : ReqFailsafeEnlaceSeguridad by supervisorEnlaceWatchdog;
+        satisfy requirement : ReqEstanqueidadAntenasVadeo by sistemaAntenas;
     }
 }

@@ -100,7 +100,7 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
     }
 
-    // Vista 9: Interconexiones completas del Sistema de Comunicaciones (equivalente a IBD)
+    // Vista 9: Interconexiones completas del Sistema de Comunicaciones (equivalente a IBD de extremo a extremo)
     view vistaConexionesComunicaciones : InterconnectionView {
         doc /* Muestra la topología completa de comunicaciones entre las estaciones externas (Puesto de Mando PMP, Consola CPT, UAV Cenital) y el UGV, con sus enlaces de RF, cámaras de navegación y computador/frenado de control (RCOM-01..03, RSW-06, RGEN-09, RGEN-17, RGEN-20) */
         expose SistemaUGV::SistemaUGVPesadoDual::puestoMando;
@@ -117,5 +117,11 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
         expose SistemaUGV::PlataformaUGV::c_comms_frenado_ctrl;
         expose SistemaUGV::PlataformaUGV::c_comms_modo_nav;
+    }
+
+    // Vista 10: Interconexión interna detallada del Subsistema de Comunicaciones Embarcado (IBD interno)
+    view vistaInternaComunicaciones : InterconnectionView {
+        doc /* Muestra la arquitectura interna de transceptores (LOS, BLOS, CNR), módulo criptográfico COMSEC, gestor de redundancia QoS/PACE, supervisor watchdog de frenado failsafe y matriz de antenas del UGV (RCOM-01..03, RSW-06, RGEN-09, RGEN-17, RLT1-10) */
+        expose SubsistemaComunicaciones::SistemaComunicacionesEmbarcado;
     }
 }
