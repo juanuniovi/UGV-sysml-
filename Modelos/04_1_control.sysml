@@ -29,9 +29,24 @@ package SubsistemaControl {
         enum NAVEGACION;
     }
 
+    enum def SubmodoNavegacionAutonoma {
+        doc /* Submodos funcionales de navegacion autonoma comandables antes y durante la mision (ROPE-05) */
+        enum PUNTOS_PASO;           // Navegacion por waypoints definidos antes o durante el recorrido
+        enum PUNTO_DESTINO;         // Navegacion autonoma eficiente a punto de destino final
+        enum REGRESO_ORIGEN;        // Retorno autonomo a punto de paso previo o vuelta a casa
+        enum SEGUIMIENTO_FOLLOW_ME; // Seguimiento automatico de personas o de otros vehiculos
+        enum SHUTTLE_LANZADERA;     // Lanzadera ciclica de ida y vuelta entre dos puntos
+    }
+
     item def ComandoModoOperacion {
         doc /* Orden de conmutacion entre modo TELEOPERADO y NAVEGACION enviada desde las Estaciones de Control PMP/CPT (ROPE-01) */
         attribute modoObjetivo : ModoOperacionConduccion;
+    }
+
+    item def ComandoSubmodoAutonomia {
+        doc /* Orden de activacion y conmutacion de submodo de navegacion autonoma recibido desde las Estaciones de Control (ROPE-05) */
+        attribute submodoObjetivo : SubmodoNavegacionAutonoma;
+        attribute habilitado : Boolean;
     }
 
     // --- Definiciones de Puertos de Control ---
@@ -86,6 +101,8 @@ package SubsistemaControl {
     // --- Definiciones de Partes Internas del Subsistema 4.1 de Control ---
     part def ComputadorAutonomia {
         doc /* Computador de navegacion autonoma en ROS 2 compuesto por Fusion y Estado, Planificacion y Evaluacion, y Supervisor de Seguridad (ROPE-05, RGEN-17) */
+        attribute submodoActivo : SubmodoNavegacionAutonoma;
+
         part subsistemaFusionEstado : SubsistemaFusionEstado;
         part subsistemaPlanificacionEvaluacion : SubsistemaPlanificacionEvaluacion;
         part supervisorSeguridad : SupervisorSeguridad;
@@ -147,11 +164,18 @@ package SubsistemaControl {
         require constraint { true }
     }
 
+    requirement def ReqSubmodosNavegacionAutonoma {
+        subject ctrl : SistemaControl;
+        doc /* El modo AUTONOMO o de navegacion autonoma incorporara al menos cinco submodos habilitables y deshabilitables antes y durante la mision: navegacion por puntos de paso (waypoints), navegacion mediante punto de destino, regreso autonomo al origen o punto anterior (vuelta a casa), seguimiento automatico de personas o vehiculos (Follow-Me) y shuttle o lanzadera entre dos puntos (ROPE-05). */
+        require constraint { true }
+    }
+
     // --- Bloque Principal del Subsistema 4.1 de Control ---
     part def SistemaControl {
         doc /* Ensamblaje del computador de autonomia, gobierno de control y modulo de frenado de seguridad (ROPE-01, ROPE-05, RGEN-09, RGEN-17) */
         attribute modoDeteccionComandado : ModoDeteccionObstaculos;
         attribute modoOperacionComandado : ModoOperacionConduccion;
+        attribute submodoAutonomiaComandado : SubmodoNavegacionAutonoma;
 
         // Computadores y modulos de control y actuacion segura
         part gobiernoControl : GobiernoControl;               // Gestion de transicion entre Modo Teleoperado y Navegacion (ROPE-01)
@@ -190,5 +214,6 @@ package SubsistemaControl {
 
         // Satisfaccion formal de requisitos en SistemaControl
         satisfy ReqModoTeleoperado by gobiernoControl;
+        satisfy ReqSubmodosNavegacionAutonoma by computadorAutonomia;
     }
 }
