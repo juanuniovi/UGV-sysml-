@@ -25,7 +25,7 @@ El subsistema `SistemaControl` SHALL incorporar la parte `gobiernoControl : Gobi
 - **THEN** activa la generación de consignas de conducción y frenado en `subsistemaPlanificacionEvaluacion` hacia los actuadores
 
 ### Requirement: Puertos de contorno e interconexiones internas de SistemaControl (ROPE-05, RGEN-17)
-El bloque `SistemaControl` SHALL exponer puertos de montaje y alimentación (`chassisMount`, `powerInput`), puertos de bus de plataforma (`dataBus`, `driveByWireOutput`), puertos de interfaz de entrada desde el Subsistema de Navegación (`entradaObstaculos : ~PuertoMapaObstaculos`, `entradaOdometria : ~PuertoOdometriaVIO`), y el puerto de salida de iluminación (`salidaIntensidad : PuertoIntensidadIluminacion`), enlazándolos con `computadorAutonomia` y `moduloFrenadoSeguridad` sin enviar la orden de modo de detección desde `computadorAutonomia`.
+El bloque `SistemaControl` SHALL exponer puertos de montaje y alimentación (`chassisMount`, `powerInput`), puertos de bus de plataforma (`dataBus`, `driveByWireOutput`), puertos de interfaz de entrada desde el Subsistema de Navegación (`entradaObstaculos : ~PuertoMapaObstaculos`, `entradaOdometria : ~PuertoOdometriaVIO`), y el puerto de salida de iluminación (`salidaIntensidad : PuertoIntensidadIluminacion`), enlazándolos canónicamente (`bind outer = inner;`) con `computadorAutonomia` y `moduloFrenadoSeguridad` sin enviar la orden de modo de detección desde `computadorAutonomia`.
 
 #### Scenario: Flujo interno de consignas en SistemaControl
 - **WHEN** `SistemaControl` recibe un mapa de obstáculos por `entradaObstaculos`, odometría por `entradaOdometria` y órdenes de misión desde `dataBus`

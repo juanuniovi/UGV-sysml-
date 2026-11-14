@@ -103,7 +103,7 @@ package SubsistemaControl {
         binding b_plan_comms bind busComunicaciones = subsistemaPlanificacionEvaluacion.busComunicaciones;
         binding b_plan_habilitacion bind entradaHabilitacionConsignas = subsistemaPlanificacionEvaluacion.entradaControlModo;
         binding b_plan_consigna bind subsistemaPlanificacionEvaluacion.salidaConsigna = salidaConsigna;
-        binding b_plan_intensidad bind subsistemaPlanificacionEvaluacion.salidaIntensidad = salidaIntensidad;
+        binding b_plan_intensidad bind salidaIntensidad = subsistemaPlanificacionEvaluacion.salidaIntensidad;
         binding b_watchdog_consigna bind supervisorSeguridad.salidaFrenadoWatchdog = salidaConsigna;
 
         // Conexiones internas entre los tres subsistemas ROS 2
@@ -173,7 +173,7 @@ package SubsistemaControl {
         // Conexiones internas con los puertos de contorno hacia SubsistemaNavegacion
         binding c_entrada_obstaculos bind entradaObstaculos = computadorAutonomia.entradaObstaculos;
         binding c_entrada_vio bind entradaOdometria = computadorAutonomia.entradaOdometria;
-        binding b_ctrl_intensidad bind computadorAutonomia.salidaIntensidad = salidaIntensidad;
+        binding b_ctrl_intensidad bind salidaIntensidad = computadorAutonomia.salidaIntensidad;
 
         // Conexion interna entre computador de autonomia y modulo de frenado de seguridad
         connection c_autonomia_frenado connect computadorAutonomia.salidaConsigna to moduloFrenadoSeguridad.entradaConsigna;

@@ -7,11 +7,11 @@ Especifica la arquitectura interna, bloques tipados, puertos, conexiones, accion
 ## Requirements
 
 ### Requirement: Estructura del Subsistema 4.3 de Iluminación y subparte de iluminación 360° (RGEN-20)
-El modelo SHALL definir en `Modelos/04_3_iluminacion.sysml` el paquete `SubsistemaIluminacion` con el bloque principal `SistemaIluminacion`, definiendo el ítem de datos `item def Intensidad` y el puerto tipado simétrico `port def PuertoIntensidadIluminacion` que contiene `item intensidad : Intensidad;` sin modificador de dirección `out`, integrando directamente en `SistemaIluminacion` los atributos de cobertura 360 grados (`anguloCoberturaDeg : Real = 360.0`, `potenciaConsumoWatts : Potencia`, `alcanceEfectivoMetros : Longitud`), con el puerto de potencia (`powerInput : ElectricalPowerPort`) y el puerto receptor de intensidad (`entradaIntensidad : PuertoIntensidadIluminacion`), excluyendo puertos mecánicos o de bus redundantes (`chassisMount`, `dataBus`).
+El modelo SHALL definir en `Modelos/04_3_iluminacion.sysml` el paquete `SubsistemaIluminacion` con el bloque principal `SistemaIluminacion`, definiendo el ítem de datos `item def Intensidad` y el puerto tipado de gobierno y emisión `port def PuertoIntensidadIluminacion` dotado del flujo direccional explícito `out item intensidad : Intensidad;`, integrando directamente en `SistemaIluminacion` los atributos de cobertura 360 grados (`anguloCoberturaDeg : Real = 360.0`, `potenciaConsumoWatts : Potencia`, `alcanceEfectivoMetros : Longitud`), con el puerto de potencia (`powerInput : ElectricalPowerPort`) y el puerto receptor conjugado de intensidad (`entradaIntensidad : ~PuertoIntensidadIluminacion`), excluyendo puertos mecánicos o de bus redundantes (`chassisMount`, `dataBus`).
 
 #### Scenario: Composición interna de SistemaIluminacion
 - **WHEN** se inspecciona la estructura de `SubsistemaIluminacion::SistemaIluminacion`
-- **THEN** contiene directamente los atributos de cobertura 360°, y expone los puertos funcionales `powerInput` y `entradaIntensidad`, con `PuertoIntensidadIluminacion` definido como puerto simétrico sin restricción direccional
+- **THEN** contiene directamente los atributos de cobertura 360°, y expone los puertos funcionales `powerInput` y `entradaIntensidad : ~PuertoIntensidadIluminacion`, con `PuertoIntensidadIluminacion` definiendo el flujo formal `out item intensidad : Intensidad` para resolución canónica en Spec42
 
 ### Requirement: Acción de iluminación 360 grados
 El bloque `SistemaIluminacion` SHALL ejecutar la acción `Iluminar360Grados` (`iluminar360Grados`), la cual comanda y activa directamente la emisión lumínica perimetral en 360 grados del subsistema de iluminación.

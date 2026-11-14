@@ -11,7 +11,7 @@ package SubsistemaIluminacion {
 
     port def PuertoIntensidadIluminacion {
         doc /* Puerto de gobierno y transmision de consigna de intensidad luminica perimetral */
-        item intensidad : Intensidad;
+        out item intensidad : Intensidad;
     }
 
     // --- Accion de Iluminacion 360 Grados (RGEN-20) ---
@@ -38,7 +38,7 @@ package SubsistemaIluminacion {
 
         // Puertos externos hacia la plataforma UGV, control y alimentacion
         port powerInput : ElectricalPowerPort;
-        port entradaIntensidad : PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
+        port entradaIntensidad : ~PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
 
         // Accion local de iluminacion perimetral 360 grados
         perform action iluminar360Grados : Iluminar360Grados;
