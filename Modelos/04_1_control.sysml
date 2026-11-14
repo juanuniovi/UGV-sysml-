@@ -74,8 +74,8 @@ package SubsistemaControl {
         port salidaFrenadoWatchdog : PuertoConsignaAutonomia;
     }
 
-    part def ControlModoOperacion {
-        doc /* Gestiona la transicion entre Modo Teleoperado y Modo Navegacion, activando o desactivando las consignas de planificacion de la autonomia (ROPE-01) */
+    part def GobiernoControl {
+        doc /* Gestiona el arbitraje entre Modo Teleoperado y Modo Navegacion, activando o desactivando las consignas de planificacion de la autonomia (ROPE-01) */
         attribute modoActivo : ModoOperacionConduccion;
         port busComunicaciones : DataBusPort;
         port salidaControlHabilitacion : DataBusPort;
@@ -145,12 +145,12 @@ package SubsistemaControl {
 
     // --- Bloque Principal del Subsistema 4.1 de Control ---
     part def SistemaControl {
-        doc /* Ensamblaje del computador de autonomia, control de modo de operacion y modulo de frenado de seguridad (ROPE-01, ROPE-05, RGEN-09, RGEN-17) */
+        doc /* Ensamblaje del computador de autonomia, gobierno de control y modulo de frenado de seguridad (ROPE-01, ROPE-05, RGEN-09, RGEN-17) */
         attribute modoDeteccionComandado : ModoDeteccionObstaculos;
         attribute modoOperacionComandado : ModoOperacionConduccion;
 
         // Computadores y modulos de control y actuacion segura
-        part controlModoOperacion : ControlModoOperacion;     // Gestion de transicion entre Modo Teleoperado y Navegacion (ROPE-01)
+        part gobiernoControl : GobiernoControl;               // Gestion de transicion entre Modo Teleoperado y Navegacion (ROPE-01)
         part computadorAutonomia : ComputadorAutonomia;       // Waypoints georreferenciados, Follow-Me y mando de modo (ROPE-05, RGEN-09)
         part moduloFrenadoSeguridad : ModuloFrenadoSeguridad; // Frenado automatico progresivo con inhabilitacion manual (RGEN-17)
 
@@ -174,8 +174,8 @@ package SubsistemaControl {
 
         // Conexiones con los buses externos de la plataforma (Comunicaciones/Equipos de Control y Drive-by-Wire)
         connection c_bus_comunicaciones connect dataBus to computadorAutonomia.busComunicaciones;
-        connection c_bus_comms_modo connect dataBus to controlModoOperacion.busComunicaciones;
-        connection c_modo_habilitacion_consignas connect controlModoOperacion.salidaControlHabilitacion to computadorAutonomia.entradaHabilitacionConsignas;
+        connection c_bus_comms_modo connect dataBus to gobiernoControl.busComunicaciones;
+        connection c_modo_habilitacion_consignas connect gobiernoControl.salidaControlHabilitacion to computadorAutonomia.entradaHabilitacionConsignas;
         connection c_inhabilitacion_frenado connect entradaInhabilitacionFrenado to moduloFrenadoSeguridad.controlInhabilitacionManual;
         connection c_frenado_dbw connect moduloFrenadoSeguridad.salidaActuacion to driveByWireOutput;
 
@@ -183,6 +183,6 @@ package SubsistemaControl {
         perform action generarControlAutonomo : GenerarControlAutonomo;
 
         // Satisfaccion formal de requisitos en SistemaControl
-        satisfy ReqModoTeleoperado by controlModoOperacion;
+        satisfy ReqModoTeleoperado by gobiernoControl;
     }
 }
