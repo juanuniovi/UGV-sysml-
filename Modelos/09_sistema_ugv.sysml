@@ -143,6 +143,7 @@ package SistemaUGV {
         satisfy requirement : ReqNavegacionGNSSDenegado by navegacion;
         satisfy requirement : ReqDeteccionObstaculosModoSigiloso by navegacion;
         satisfy requirement : ReqConcienciaSituacionalVisionSensores by navegacion;
+        satisfy requirement : ReqDeteccionEvasionObstaculos by navegacion;
         satisfy requirement : ReqFrenadoAutomaticoColision by control;
         satisfy requirement : ReqModoTeleoperado by control;
         satisfy requirement : ReqConscienciaSituacionalIluminacion360 by iluminacion;

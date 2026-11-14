@@ -231,6 +231,12 @@ package SubsistemaNavegacion {
         require constraint { true }
     }
 
+    requirement def ReqDeteccionEvasionObstaculos {
+        subject nav : SistemaNavegacion;
+        doc /* El sistema en su modo AUTONOMO debera tener la capacidad de "Detectar y Evadir" obstaculos estaticos y dinamicos, que se interpongan en la trayectoria del UGV, y lo debera realizar independientemente de si se encuentra en Modo de Deteccion NORMAL o SIGILOSO. Esto incluye recalcular trayectorias, dar marcha atras, volverse y buscar otras alternativas, etc. (ROPE-06). */
+        require constraint { true }
+    }
+
     // --- Bloque Principal del Subsistema 4.2 de Navegacion ---
     part def SistemaNavegacion {
         doc /* Ensamblaje de las subpartes camaras y sensores, sistema de vision por computador, fusion de obstaculos y odometria VIO (RGEN-09, RNAV-01, ROPE-06, RGEN-20, RGEN-22) */
@@ -276,5 +282,8 @@ package SubsistemaNavegacion {
         // Acciones locales de deteccion y gestion de modo de deteccion (RGEN-09)
         perform action configurarModoDeteccion : ConfigurarModoDeteccion;
         perform action detectarObstaculos : DetectarObstaculosNavegacion;
+
+        // Satisfaccion formal de requisitos en SistemaNavegacion (ROPE-06)
+        satisfy ReqDeteccionEvasionObstaculos by moduloDeteccionEvasion;
     }
 }
