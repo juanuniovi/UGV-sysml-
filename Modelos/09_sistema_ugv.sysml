@@ -107,7 +107,6 @@ package SistemaUGV {
         connection c_barcaza_powertrain connect barcaza.powertrainMount to plantaMotriz.chassisMount;
         connection c_barcaza_control connect barcaza.avionicaMount to control.chassisMount;
         connection c_barcaza_navegacion connect barcaza.avionicaMount to navegacion.chassisMount;
-        connection c_barcaza_iluminacion connect barcaza.avionicaMount to iluminacion.chassisMount;
 
         // Conexiones de potencia electrica
         connection c_power_traction connect plantaMotriz.powerOutputTraction to rodaje.powerInput;

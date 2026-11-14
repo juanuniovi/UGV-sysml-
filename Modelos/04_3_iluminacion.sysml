@@ -37,10 +37,8 @@ package SubsistemaIluminacion {
         attribute alcanceEfectivoMetros : Longitud;
 
         // Puertos externos hacia la plataforma UGV, control y alimentacion
-        port chassisMount : MechanicalMountPort;
         port powerInput : ElectricalPowerPort;
-        port dataBus : DataBusPort; // Enlace con el bus de comunicaciones embarcado
-        port entradaIntensidad : ~PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
+        port entradaIntensidad : PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
 
         // Accion local de iluminacion perimetral 360 grados
         perform action iluminar360Grados : Iluminar360Grados;
