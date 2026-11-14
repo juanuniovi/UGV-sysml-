@@ -32,8 +32,8 @@ package SubsistemaNavegacion {
         attribute modoObjetivo : ModoDeteccionObstaculos;
     }
 
-    item def ControlEmisionRadiante {
-        doc /* Senal de activacion o desactivacion de emision hacia sensores radiantes LiDAR y radar (RGEN-09) */
+    item def ControlEmisionSigilosoNormal {
+        doc /* Senal de control de emision hacia sensores radiantes LiDAR y radar conmutando entre modo NORMAL y SIGILOSO (RGEN-09) */
         attribute emitir : Boolean;
     }
 
@@ -191,7 +191,7 @@ package SubsistemaNavegacion {
         doc /* Activa o desactiva las tecnologias radiantes (LiDAR, radar) conmutando entre modo NORMAL y SIGILOSO (RGEN-09) */
         in comando : ComandoModoDeteccion;
         out modoActivo : ModoDeteccionObstaculos;
-        out controlRadiante : ControlEmisionRadiante;
+        out controlRadiante : ControlEmisionSigilosoNormal;
 
         action evaluarComandoModo { out modoSeleccionado : ModoDeteccionObstaculos; }
         action conmutarEmisionRadiante { out estadoRadiantes : Boolean; }
@@ -228,6 +228,12 @@ package SubsistemaNavegacion {
     requirement def ReqConcienciaSituacionalVisionSensores {
         subject nav : SistemaNavegacion;
         doc /* El UGV dispondra de medios de captacion de imagen y sensores que aporten conciencia situacional, faciliten la teleoperacion y el trabajo con implementos, incluyendo visualizacion de implementos y estado del tren de rodaje mediante transductores de contacto y dinamicos, imagenes independientes de cada lateral, vision de profundidad en 360 grados y camara termica que identifique puntos calientes (RGEN-22). */
+        require constraint { true }
+    }
+
+    requirement def ReqDeteccionEvasionObstaculos {
+        subject nav : SistemaNavegacion;
+        doc /* El sistema en su modo AUTONOMO debera tener la capacidad de "Detectar y Evadir" obstaculos estaticos y dinamicos, que se interpongan en la trayectoria del UGV, y lo debera realizar independientemente de si se encuentra en Modo de Deteccion NORMAL o SIGILOSO. Esto incluye recalcular trayectorias, dar marcha atras, volverse y buscar otras alternativas, etc. (ROPE-06). */
         require constraint { true }
     }
 
@@ -276,5 +282,8 @@ package SubsistemaNavegacion {
         // Acciones locales de deteccion y gestion de modo de deteccion (RGEN-09)
         perform action configurarModoDeteccion : ConfigurarModoDeteccion;
         perform action detectarObstaculos : DetectarObstaculosNavegacion;
+
+        // Satisfaccion formal de requisitos en SistemaNavegacion (ROPE-06)
+        satisfy ReqDeteccionEvasionObstaculos by moduloDeteccionEvasion;
     }
 }

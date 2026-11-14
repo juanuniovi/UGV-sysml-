@@ -3,12 +3,15 @@ package SubsistemaIluminacion {
     private import ScalarValues::*;
     private import TiposBase::*;
 
-    // --- Subparte de Iluminacion 360 Grados (RGEN-20) ---
-    part def Iluminacion360 {
-        doc /* Subparte de iluminacion perimetral en 360 grados para apoyo visual y consciencia situacional (RGEN-20) */
-        attribute anguloCoberturaDeg : Real = 360.0;
-        attribute potenciaConsumoWatts : Potencia;
-        attribute alcanceEfectivoMetros : Longitud;
+    // --- Items y Puertos de Control de Intensidad (ROPE-01, ROPE-02, RGEN-20) ---
+    item def Intensidad {
+        doc /* Item de consigna de intensidad luminica perimetral (0.0 a 100.0 %) comandada por el sistema de control */
+        attribute nivelPorcentaje : Real;
+    }
+
+    port def PuertoIntensidadIluminacion {
+        doc /* Puerto de gobierno y transmision de consigna de intensidad luminica perimetral */
+        out item intensidad : Intensidad;
     }
 
     // --- Accion de Iluminacion 360 Grados (RGEN-20) ---
@@ -28,18 +31,19 @@ package SubsistemaIluminacion {
     part def SistemaIluminacion {
         doc /* Ensamblaje del subsistema de iluminacion perimetral del UGV (RGEN-20) */
 
-        // Subparte de iluminacion 360 (RGEN-20)
-        part iluminacion360 : Iluminacion360; // Subparte de iluminacion perimetral 360 grados (RGEN-20)
+        // Atributos de iluminacion perimetral 360 grados (RGEN-20)
+        attribute anguloCoberturaDeg : Real = 360.0;
+        attribute potenciaConsumoWatts : Potencia;
+        attribute alcanceEfectivoMetros : Longitud;
 
-        // Puertos externos hacia la plataforma UGV y comunicaciones
-        port chassisMount : MechanicalMountPort;
+        // Puertos externos hacia la plataforma UGV, control y alimentacion
         port powerInput : ElectricalPowerPort;
-        port dataBus : DataBusPort; // Enlace directo con el bus de comunicaciones
+        port entradaIntensidad : ~PuertoIntensidadIluminacion; // Recepcion de intensidad desde SistemaControl
 
         // Accion local de iluminacion perimetral 360 grados
         perform action iluminar360Grados : Iluminar360Grados;
 
         // Satisfaccion formal de requisitos
-        satisfy requirement : ReqConscienciaSituacionalIluminacion360 by iluminacion360;
+        satisfy requirement : ReqConscienciaSituacionalIluminacion360;
     }
 }

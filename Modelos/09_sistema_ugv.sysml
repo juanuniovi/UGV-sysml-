@@ -107,7 +107,6 @@ package SistemaUGV {
         connection c_barcaza_powertrain connect barcaza.powertrainMount to plantaMotriz.chassisMount;
         connection c_barcaza_control connect barcaza.avionicaMount to control.chassisMount;
         connection c_barcaza_navegacion connect barcaza.avionicaMount to navegacion.chassisMount;
-        connection c_barcaza_iluminacion connect barcaza.avionicaMount to iluminacion.chassisMount;
 
         // Conexiones de potencia electrica
         connection c_power_traction connect plantaMotriz.powerOutputTraction to rodaje.powerInput;
@@ -120,7 +119,7 @@ package SistemaUGV {
         connection c_bus_comms_control connect comunicaciones.dataBus to control.dataBus;
         connection c_drive_by_wire connect control.driveByWireOutput to rodaje.controlBus;
         connection c_pms_control connect control.dataBus to plantaMotriz.controlBus;
-        connection c_comms_iluminacion connect comunicaciones.dataBus to iluminacion.dataBus;
+        connection c_control_iluminacion connect control.salidaIntensidad to iluminacion.entradaIntensidad;
 
         // Conexiones entre el Subsistema 4.2 de Navegacion, Comunicaciones y el Subsistema 4.1 de Control (RGEN-09, RNAV-01, ROPE-06, RGEN-17, RGEN-22)
         connection c_nav_obstaculos_ctrl connect navegacion.salidaObstaculos to control.entradaObstaculos;
@@ -144,7 +143,10 @@ package SistemaUGV {
         satisfy requirement : ReqNavegacionGNSSDenegado by navegacion;
         satisfy requirement : ReqDeteccionObstaculosModoSigiloso by navegacion;
         satisfy requirement : ReqConcienciaSituacionalVisionSensores by navegacion;
+        satisfy requirement : ReqDeteccionEvasionObstaculos by navegacion;
         satisfy requirement : ReqFrenadoAutomaticoColision by control;
+        satisfy requirement : ReqModoTeleoperado by control;
+        satisfy requirement : ReqSubmodosNavegacionAutonoma by control;
         satisfy requirement : ReqConscienciaSituacionalIluminacion360 by iluminacion;
     }
 

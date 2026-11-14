@@ -72,9 +72,10 @@ package VistasUGV {
 
     // Vista 7: Estructura conjunta de los Subsistemas 4.1 Control y 4.2 Navegación (equivalente a BDD)
     view vistaEstructuraNavegacionControl : GeneralView {
-        doc /* Muestra conjuntamente las dos partes (control y navegacion) con sus bloques internos (computador de autonomía y sus tres subsistemas ROS 2, frenado, subpartes camaras y sensores con LiDAR, radar, transductores de rodaje, cámaras 360 con profundidad, cámaras laterales y térmica de puntos calientes, visión por computador, detección/evasión y odometría VIO), sus puertos y conexiones (RGEN-09, RNAV-01, ROPE-05, ROPE-06, RGEN-17, RGEN-20, RGEN-22) */
+        doc /* Muestra conjuntamente las dos partes (control y navegacion) con sus bloques internos (computador de autonomía y sus tres subsistemas ROS 2, frenado, subpartes camaras y sensores con LiDAR, radar, transductores de rodaje, cámaras 360 con profundidad, cámaras laterales y térmica de puntos calientes, visión por computador, detección/evasión y odometría VIO), subsistema de iluminacion 360, sus puertos y conexiones (RGEN-09, RNAV-01, ROPE-05, ROPE-06, RGEN-17, RGEN-20, RGEN-22) */
         expose SistemaUGV::PlataformaUGV::control;
         expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::iluminacion;
         expose SistemaUGV::PlataformaUGV::comunicaciones;
         expose SistemaUGV::PlataformaUGV::c_nav_obstaculos_ctrl;
         expose SistemaUGV::PlataformaUGV::c_nav_vio_ctrl;
@@ -83,15 +84,17 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_nav_video_comms;
         expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
+        expose SistemaUGV::PlataformaUGV::c_control_iluminacion;
         filter @SysML::PartUsage or @SysML::PortUsage
             or @SysML::ConnectionUsage or @SysML::BindingConnectorAsUsage;
     }
 
     // Vista 8: Interconexiones conjuntas de los Subsistemas 4.1 Control y 4.2 Navegación (equivalente a IBD)
     view vistaConexionesNavegacionControl : InterconnectionView {
-        doc /* Muestra conjuntamente ambas partes (control y navegacion), el interior de computadorAutonomia y de las subpartes camaras y sensores, sus puertos y las conexiones tanto internas como con Comunicaciones y entre Navegación y Control (RGEN-09, RNAV-01, RGEN-17, RGEN-22) */
+        doc /* Muestra conjuntamente las partes de control, navegacion e iluminacion, el interior de computadorAutonomia y de las subpartes camaras y sensores, sus puertos y las conexiones tanto internas como con Comunicaciones y entre Navegación y Control (RGEN-09, RNAV-01, RGEN-17, RGEN-20, RGEN-22) */
         expose SistemaUGV::PlataformaUGV::control;
         expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::iluminacion;
         expose SistemaUGV::PlataformaUGV::comunicaciones;
         expose SistemaUGV::PlataformaUGV::c_nav_obstaculos_ctrl;
         expose SistemaUGV::PlataformaUGV::c_nav_vio_ctrl;
@@ -100,6 +103,7 @@ package VistasUGV {
         expose SistemaUGV::PlataformaUGV::c_nav_video_comms;
         expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
         expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
+        expose SistemaUGV::PlataformaUGV::c_control_iluminacion;
     }
 
     // Vista 9: Interconexiones del Subsistema de Comunicaciones (equivalente a IBD)
