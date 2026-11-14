@@ -21,6 +21,18 @@ package SubsistemaControl {
         doc /* Consignas de direccion, traccion y frenado generadas por el computador de autonomia (ROPE-05, ROPE-06) */
     }
 
+    // --- Modos de Operacion de Conduccion y Telemando (ROPE-01, ROPE-05) ---
+    enum def ModoOperacionConduccion {
+        doc /* Modos de operacion de conduccion del UGV: TELEOPERADO (mando remoto directo) o NAVEGACION (autonomia por waypoints) */
+        enum TELEOPERADO;
+        enum NAVEGACION;
+    }
+
+    item def ComandoModoOperacion {
+        doc /* Orden de conmutacion entre modo TELEOPERADO y NAVEGACION enviada desde las Estaciones de Control PMP/CPT (ROPE-01) */
+        attribute modoObjetivo : ModoOperacionConduccion;
+    }
+
     // --- Definiciones de Puertos de Control ---
     port def PuertoMapaEstadoUnificado {
         doc /* Puerto de entrega del mapa y estado unificado desde fusion hacia planificacion y evaluacion */
@@ -48,8 +60,10 @@ package SubsistemaControl {
 
     part def SubsistemaPlanificacionEvaluacion {
         doc /* Evalua si existe riesgo de colision a partir del mapa unificado y genera las consignas de conduccion y frenado (ROPE-05, ROPE-06, RGEN-17) */
+        attribute consignasHabilitadas : Boolean;
         port entradaMapaUnificado : ~PuertoMapaEstadoUnificado;
         port busComunicaciones : DataBusPort;
+        port entradaControlModo : DataBusPort;
         port salidaSalud : PuertoLatidoSalud;
         port salidaConsigna : PuertoConsignaAutonomia;
     }
@@ -58,6 +72,13 @@ package SubsistemaControl {
         doc /* Bloque logico independiente segregado en software cuya unica mision es verificar que el computador principal no se ha colgado y emitir ConsignaFrenado si hay perdida de comunicacion interna (RGEN-17) */
         port entradaSalud : ~PuertoLatidoSalud;
         port salidaFrenadoWatchdog : PuertoConsignaAutonomia;
+    }
+
+    part def ControlModoOperacion {
+        doc /* Gestiona la transicion entre Modo Teleoperado y Modo Navegacion, activando o desactivando las consignas de planificacion de la autonomia (ROPE-01) */
+        attribute modoActivo : ModoOperacionConduccion;
+        port busComunicaciones : DataBusPort;
+        port salidaControlHabilitacion : DataBusPort;
     }
 
     // --- Definiciones de Partes Internas del Subsistema 4.1 de Control ---
@@ -71,11 +92,13 @@ package SubsistemaControl {
         port entradaOdometria : ~PuertoOdometriaVIO;
         port salidaConsigna : PuertoConsignaAutonomia;
         port busComunicaciones : DataBusPort;
+        port entradaHabilitacionConsignas : DataBusPort;
 
         // Enlaces con los puertos de contorno de ComputadorAutonomia
         binding b_fusion_obstaculos bind entradaObstaculos = subsistemaFusionEstado.entradaObstaculos;
         binding b_fusion_odometria bind entradaOdometria = subsistemaFusionEstado.entradaOdometria;
         binding b_plan_comms bind busComunicaciones = subsistemaPlanificacionEvaluacion.busComunicaciones;
+        binding b_plan_habilitacion bind entradaHabilitacionConsignas = subsistemaPlanificacionEvaluacion.entradaControlModo;
         binding b_plan_consigna bind subsistemaPlanificacionEvaluacion.salidaConsigna = salidaConsigna;
         binding b_watchdog_consigna bind supervisorSeguridad.salidaFrenadoWatchdog = salidaConsigna;
 
@@ -114,12 +137,20 @@ package SubsistemaControl {
         require constraint { true }
     }
 
+    requirement def ReqModoTeleoperado {
+        subject ctrl : SistemaControl;
+        doc /* El UGV dispondra de un modo de operacion teleoperado gobernable de forma remota desde las estaciones de control (CPT en LOS y PMP en BLOS), durante el cual se desactivan las consignas de guiado y planificacion de la autonomia (ROPE-01). */
+        require constraint { true }
+    }
+
     // --- Bloque Principal del Subsistema 4.1 de Control ---
     part def SistemaControl {
-        doc /* Ensamblaje del computador de autonomia, gestion de modo de deteccion y modulo de frenado de seguridad (ROPE-05, RGEN-09, RGEN-17) */
+        doc /* Ensamblaje del computador de autonomia, control de modo de operacion y modulo de frenado de seguridad (ROPE-01, ROPE-05, RGEN-09, RGEN-17) */
         attribute modoDeteccionComandado : ModoDeteccionObstaculos;
+        attribute modoOperacionComandado : ModoOperacionConduccion;
 
         // Computadores y modulos de control y actuacion segura
+        part controlModoOperacion : ControlModoOperacion;     // Gestion de transicion entre Modo Teleoperado y Navegacion (ROPE-01)
         part computadorAutonomia : ComputadorAutonomia;       // Waypoints georreferenciados, Follow-Me y mando de modo (ROPE-05, RGEN-09)
         part moduloFrenadoSeguridad : ModuloFrenadoSeguridad; // Frenado automatico progresivo con inhabilitacion manual (RGEN-17)
 
@@ -143,10 +174,15 @@ package SubsistemaControl {
 
         // Conexiones con los buses externos de la plataforma (Comunicaciones/Equipos de Control y Drive-by-Wire)
         connection c_bus_comunicaciones connect dataBus to computadorAutonomia.busComunicaciones;
+        connection c_bus_comms_modo connect dataBus to controlModoOperacion.busComunicaciones;
+        connection c_modo_habilitacion_consignas connect controlModoOperacion.salidaControlHabilitacion to computadorAutonomia.entradaHabilitacionConsignas;
         connection c_inhabilitacion_frenado connect entradaInhabilitacionFrenado to moduloFrenadoSeguridad.controlInhabilitacionManual;
         connection c_frenado_dbw connect moduloFrenadoSeguridad.salidaActuacion to driveByWireOutput;
 
         // Accion local de generacion de consignas de control y frenado
         perform action generarControlAutonomo : GenerarControlAutonomo;
+
+        // Satisfaccion formal de requisitos en SistemaControl
+        satisfy ReqModoTeleoperado by controlModoOperacion;
     }
 }
