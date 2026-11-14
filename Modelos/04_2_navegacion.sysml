@@ -32,8 +32,8 @@ package SubsistemaNavegacion {
         attribute modoObjetivo : ModoDeteccionObstaculos;
     }
 
-    item def ControlEmisionRadiante {
-        doc /* Senal de activacion o desactivacion de emision hacia sensores radiantes LiDAR y radar (RGEN-09) */
+    item def ControlEmisionSigilosoNormal {
+        doc /* Senal de control de emision hacia sensores radiantes LiDAR y radar conmutando entre modo NORMAL y SIGILOSO (RGEN-09) */
         attribute emitir : Boolean;
     }
 
@@ -191,7 +191,7 @@ package SubsistemaNavegacion {
         doc /* Activa o desactiva las tecnologias radiantes (LiDAR, radar) conmutando entre modo NORMAL y SIGILOSO (RGEN-09) */
         in comando : ComandoModoDeteccion;
         out modoActivo : ModoDeteccionObstaculos;
-        out controlRadiante : ControlEmisionRadiante;
+        out controlRadiante : ControlEmisionSigilosoNormal;
 
         action evaluarComandoModo { out modoSeleccionado : ModoDeteccionObstaculos; }
         action conmutarEmisionRadiante { out estadoRadiantes : Boolean; }
