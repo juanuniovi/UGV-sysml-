@@ -1,0 +1,234 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 730" width="1280" height="730">
+  <defs>
+    <style>
+      .title { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 13px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .pkg-title { font: 700 14px 'Segoe UI', Arial, sans-serif; }
+      .pkg-sub { font: 500 11.5px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .group-title { font: 700 12.5px 'Segoe UI', Arial, sans-serif; fill: #1e293b; }
+      .box-title { font: 700 12.5px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .box-desc { font: 400 10.5px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .edge-label { font: 600 10px 'Segoe UI', Arial, sans-serif; fill: #1e293b; }
+      .legend-text { font: 500 11.5px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    </style>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/>
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1280" height="730" rx="14" fill="#f8fafc"/>
+
+  <!-- Cabecera -->
+  <text x="32" y="40" class="title">Arquitectura Detallada: Navegación, Control e Iluminación (Parte 4)</text>
+  <text x="32" y="62" class="subtitle">Todas las subpartes y sus conexiones internas dentro de 04_2 Navegación, 04_1 Control y 04_3 Iluminación</text>
+
+  <!-- ========================================================= -->
+  <!-- CONTENEDOR 4.2: NAVEGACIÓN                                -->
+  <!-- ========================================================= -->
+  <rect x="28" y="84" width="584" height="588" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="48" y="110" class="pkg-title" fill="#1d4ed8">4.2 Subsistema de Navegación (04_2_navegacion.sysml)</text>
+  <text x="48" y="127" class="pkg-sub">SistemaNavegacion — Captación, visión pasiva, detección/evasión y odometría VIO</text>
+
+  <!-- Grupo: SubsistemaCamaras -->
+  <rect x="46" y="144" width="248" height="224" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="170" y="165" text-anchor="middle" class="group-title">SubsistemaCamaras</text>
+
+  <rect x="58" y="178" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="195" text-anchor="middle" class="box-title">CamarasOpticas360</text>
+  <text x="170" y="209" text-anchor="middle" class="box-desc">Cobertura 360° con profundidad</text>
+
+  <rect x="58" y="224" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="241" text-anchor="middle" class="box-title">CamaraLateralIzquierda</text>
+  <text x="170" y="255" text-anchor="middle" class="box-desc">Visión lateral izq. e implementos</text>
+
+  <rect x="58" y="270" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="287" text-anchor="middle" class="box-title">CamaraLateralDerecha</text>
+  <text x="170" y="301" text-anchor="middle" class="box-desc">Visión lateral der. e implementos</text>
+
+  <rect x="58" y="316" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="333" text-anchor="middle" class="box-title">CamaraTermicaNocturna</text>
+  <text x="170" y="347" text-anchor="middle" class="box-desc">Visión nocturna y puntos calientes</text>
+
+  <!-- SistemaVisionComputador -->
+  <rect x="356" y="208" width="236" height="96" rx="8" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="474" y="238" text-anchor="middle" class="box-title">SistemaVisionComputador</text>
+  <text x="474" y="256" text-anchor="middle" class="box-desc">Procesamiento óptico y térmico</text>
+  <text x="474" y="272" text-anchor="middle" class="box-desc">pasivo no radiante (RGEN-09)</text>
+
+  <!-- Conexiones individuales Camaras -> SistemaVisionComputador -->
+  <path d="M 282 197 L 318 197 L 318 228 L 350 228" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrow-blue)"/>
+  <path d="M 282 243 L 350 243" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrow-blue)"/>
+  <path d="M 282 289 L 318 289 L 318 260 L 350 260" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrow-blue)"/>
+  <path d="M 282 335 L 330 335 L 330 282 L 350 282" fill="none" stroke="#d97706" stroke-width="1.6" marker-end="url(#arrow-amber)"/>
+  <rect x="296" y="210" width="38" height="14" rx="3" fill="#eff6ff"/>
+  <text x="315" y="220" text-anchor="middle" class="edge-label">Óptica</text>
+  <rect x="296" y="320" width="44" height="14" rx="3" fill="#eff6ff"/>
+  <text x="318" y="330" text-anchor="middle" class="edge-label">Térmica</text>
+
+  <!-- Grupo: SubsistemaSensores -->
+  <rect x="46" y="392" width="248" height="178" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="170" y="413" text-anchor="middle" class="group-title">SubsistemaSensores</text>
+
+  <rect x="58" y="426" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="443" text-anchor="middle" class="box-title">SensorLidar</text>
+  <text x="170" y="457" text-anchor="middle" class="box-desc">Tecnología radiante (desactivable)</text>
+
+  <rect x="58" y="472" width="224" height="38" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="489" text-anchor="middle" class="box-title">SensorRadar</text>
+  <text x="170" y="503" text-anchor="middle" class="box-desc">Tecnología radiante (desactivable)</text>
+
+  <rect x="58" y="518" width="224" height="38" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" filter="url(#shadow)"/>
+  <text x="170" y="535" text-anchor="middle" class="box-title">TransductoresContactoDinamicos</text>
+  <text x="170" y="549" text-anchor="middle" class="box-desc">Estado del tren de rodaje (RGEN-22)</text>
+
+  <!-- ModuloDeteccionEvasion -->
+  <rect x="356" y="418" width="236" height="96" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
+  <text x="474" y="446" text-anchor="middle" class="box-title">ModuloDeteccionEvasion</text>
+  <text x="474" y="464" text-anchor="middle" class="box-desc">Fusión multi-sensor en tiempo real</text>
+  <text x="474" y="480" text-anchor="middle" class="box-desc">Detect &amp; Avoid (ROPE-06)</text>
+
+  <!-- OdometriaVisualInercialVIO -->
+  <rect x="356" y="564" width="236" height="86" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
+  <text x="474" y="592" text-anchor="middle" class="box-title">OdometriaVisualInercialVIO</text>
+  <text x="474" y="610" text-anchor="middle" class="box-desc">Posicionamiento autónomo ante</text>
+  <text x="474" y="626" text-anchor="middle" class="box-desc">GNSS denegado (RNAV-01)</text>
+
+  <!-- Conexiones internas 4.2 Sensores y Visión -> DeteccionEvasion -->
+  <line x1="474" y1="304" x2="474" y2="412" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="480" y="348" width="42" height="15" rx="3" fill="#eff6ff"/>
+  <text x="501" y="359" text-anchor="middle" class="edge-label">Visión</text>
+
+  <line x1="282" y1="445" x2="350" y2="445" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+  <rect x="298" y="427" width="38" height="14" rx="3" fill="#eff6ff"/>
+  <text x="317" y="437" text-anchor="middle" class="edge-label">LiDAR</text>
+
+  <line x1="282" y1="491" x2="350" y2="491" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+  <rect x="298" y="473" width="38" height="14" rx="3" fill="#eff6ff"/>
+  <text x="317" y="483" text-anchor="middle" class="edge-label">Radar</text>
+
+
+  <!-- ========================================================= -->
+  <!-- CONTENEDOR 4.1: CONTROL                                   -->
+  <!-- ========================================================= -->
+  <rect x="676" y="84" width="576" height="456" rx="12" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2"/>
+  <text x="696" y="110" class="pkg-title" fill="#3730a3">4.1 Subsistema de Control (04_1_control.sysml)</text>
+  <text x="696" y="127" class="pkg-sub">SistemaControl — Arbitraje de modo, Computador de Autonomía (ROS 2) y frenado seguro</text>
+
+  <!-- GobiernoControl -->
+  <rect x="696" y="144" width="324" height="66" rx="8" fill="#ffffff" stroke="#818cf8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="858" y="169" text-anchor="middle" class="box-title">GobiernoControl</text>
+  <text x="858" y="187" text-anchor="middle" class="box-desc">Arbitraje y transición entre Modo Teleoperado y Navegación (ROPE-01)</text>
+
+  <!-- Grupo: ComputadorAutonomia -->
+  <rect x="696" y="242" width="324" height="278" rx="10" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/>
+  <text x="858" y="264" text-anchor="middle" class="group-title" fill="#312e81">ComputadorAutonomia (ROS 2)</text>
+
+  <!-- Subparte 1: SubsistemaFusionEstado -->
+  <rect x="714" y="280" width="288" height="56" rx="6" fill="#ffffff" stroke="#6366f1" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="858" y="301" text-anchor="middle" class="box-title">SubsistemaFusionEstado</text>
+  <text x="858" y="318" text-anchor="middle" class="box-desc">Fusión de obstáculos + odometría VIO en mapa único</text>
+
+  <!-- Subparte 2: SubsistemaPlanificacionEvaluacion -->
+  <rect x="714" y="362" width="288" height="64" rx="6" fill="#ffffff" stroke="#6366f1" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="858" y="383" text-anchor="middle" class="box-title">SubsistemaPlanificacionEvaluacion</text>
+  <text x="858" y="400" text-anchor="middle" class="box-desc">Submodos (ROPE-05), riesgo de colisión y</text>
+  <text x="858" y="414" text-anchor="middle" class="box-desc">modulación de intensidad luminosa</text>
+
+  <!-- Subparte 3: SupervisorSeguridad -->
+  <rect x="714" y="452" width="288" height="52" rx="6" fill="#ffffff" stroke="#6366f1" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="858" y="473" text-anchor="middle" class="box-title">SupervisorSeguridad (Watchdog)</text>
+  <text x="858" y="490" text-anchor="middle" class="box-desc">Supervisión de vida y frenado ante fallo interno</text>
+
+  <!-- ModuloFrenadoSeguridad -->
+  <rect x="1056" y="352" width="180" height="126" rx="8" fill="#ffffff" stroke="#818cf8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="1146" y="386" text-anchor="middle" class="box-title">ModuloFrenadoSeguridad</text>
+  <text x="1146" y="406" text-anchor="middle" class="box-desc">Frenado automático progresivo</text>
+  <text x="1146" y="422" text-anchor="middle" class="box-desc">ante riesgo de colisión</text>
+  <text x="1146" y="438" text-anchor="middle" class="box-desc">(con inhabilitación manual)</text>
+  <text x="1146" y="454" text-anchor="middle" class="box-desc">(RGEN-17)</text>
+
+  <!-- Conexiones internas 4.1 -->
+  <!-- GobiernoControl -> SubsistemaPlanificacionEvaluacion (borde derecho interno) -->
+  <path d="M 960 210 L 960 226 L 1010 226 L 1010 380 L 1004 380" fill="none" stroke="#4f46e5" stroke-width="1.8" marker-end="url(#arrow-indigo)"/>
+  <rect x="896" y="216" width="114" height="15" rx="3" fill="#eef2ff"/>
+  <text x="953" y="227" text-anchor="middle" class="edge-label">Habilitación consignas</text>
+
+  <!-- Fusion -> Planificacion -->
+  <line x1="858" y1="336" x2="858" y2="356" stroke="#4f46e5" stroke-width="1.8" marker-end="url(#arrow-indigo)"/>
+  <rect x="866" y="339" width="84" height="14" rx="3" fill="#e0e7ff"/>
+  <text x="908" y="349" text-anchor="middle" class="edge-label">Mapa unificado</text>
+
+  <!-- Planificacion -> Supervisor -->
+  <line x1="858" y1="426" x2="858" y2="446" stroke="#4f46e5" stroke-width="1.8" marker-end="url(#arrow-indigo)"/>
+  <rect x="866" y="429" width="94" height="14" rx="3" fill="#e0e7ff"/>
+  <text x="913" y="439" text-anchor="middle" class="edge-label">Salud (heartbeat)</text>
+
+  <!-- Planificacion -> ModuloFrenadoSeguridad -->
+  <line x1="1002" y1="394" x2="1050" y2="394" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <rect x="1006" y="373" width="46" height="14" rx="3" fill="#eef2ff"/>
+  <text x="1029" y="383" text-anchor="middle" class="edge-label">Consigna</text>
+
+  <!-- Supervisor -> ModuloFrenadoSeguridad -->
+  <path d="M 1002 478 L 1030 478 L 1030 442 L 1050 442" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrow-red)"/>
+  <rect x="1003" y="481" width="54" height="14" rx="3" fill="#eef2ff"/>
+  <text x="1030" y="491" text-anchor="middle" class="edge-label" fill="#b91c1c">Watchdog</text>
+
+
+  <!-- ========================================================= -->
+  <!-- CONTENEDOR 4.3: ILUMINACIÓN                               -->
+  <!-- ========================================================= -->
+  <rect x="676" y="564" width="576" height="108" rx="12" fill="#fffbeb" stroke="#fcd34d" stroke-width="2"/>
+  <text x="696" y="590" class="pkg-title" fill="#b45309">4.3 Subsistema de Iluminación (04_3_iluminacion.sysml)</text>
+  <rect x="696" y="604" width="540" height="52" rx="8" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="966" y="627" text-anchor="middle" class="box-title">SistemaIluminacion</text>
+  <text x="966" y="644" text-anchor="middle" class="box-desc">Iluminación perimetral 360° regulable (0–100 %) para apoyo óptico y nocturno (RGEN-20)</text>
+
+
+  <!-- ========================================================= -->
+  <!-- CONEXIONES INTER-SUBSISTEMAS (4.2 -> 4.1 y 4.1 -> 4.3)    -->
+  <!-- ========================================================= -->
+  <!-- ModuloDeteccionEvasion -> SubsistemaFusionEstado -->
+  <path d="M 592 466 L 636 466 L 636 298 L 708 298" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+  <rect x="602" y="368" width="68" height="15" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="636" y="379" text-anchor="middle" class="edge-label">Obstáculos</text>
+
+  <!-- VIO -> SubsistemaFusionEstado -->
+  <path d="M 592 607 L 652 607 L 652 318 L 708 318" fill="none" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+  <rect x="614" y="589" width="76" height="15" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="652" y="600" text-anchor="middle" class="edge-label">Odometría VIO</text>
+
+  <!-- Planificacion -> SistemaIluminacion -->
+  <path d="M 734 426 L 734 600" fill="none" stroke="#d97706" stroke-width="2.2" marker-end="url(#arrow-amber)"/>
+  <rect x="742" y="538" width="126" height="16" rx="4" fill="#f8fafc" stroke="#fcd34d" stroke-width="0.8"/>
+  <text x="805" y="550" text-anchor="middle" class="edge-label">Consigna intensidad (%)</text>
+
+
+  <!-- ========================================================= -->
+  <!-- LEYENDA                                                   -->
+  <!-- ========================================================= -->
+  <rect x="28" y="686" width="1224" height="32" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="48" y1="702" x2="78" y2="702" stroke="#2563eb" stroke-width="2.2" marker-end="url(#arrow-blue)"/>
+  <text x="88" y="706" class="legend-text">Percepción y odometría (4.2 → 4.1)</text>
+
+  <line x1="350" y1="702" x2="380" y2="702" stroke="#4f46e5" stroke-width="2.2" marker-end="url(#arrow-indigo)"/>
+  <text x="390" y="706" class="legend-text">Control, planificación ROS 2 y consignas (4.1)</text>
+
+  <line x1="710" y1="702" x2="740" y2="702" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrow-red)"/>
+  <text x="750" y="706" class="legend-text">Frenado Watchdog (4.1)</text>
+
+  <line x1="940" y1="702" x2="970" y2="702" stroke="#d97706" stroke-width="2.2" marker-end="url(#arrow-amber)"/>
+  <text x="980" y="706" class="legend-text">Térmica (4.2) / Iluminación (4.1 → 4.3)</text>
+</svg>
