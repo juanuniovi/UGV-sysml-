@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UGV SysML v2 — Diagrama IBD de Comunicaciones Tácticas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Mermaid.js para renderizado nativo de modelos SysML/UML -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0f172a',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#94a3b8',
+        secondaryColor: '#334155',
+        tertiaryColor: '#1e293b'
+      }
+    });
+  </script>
+  <style>
+    /* Estilos personalizados y animaciones de flujo */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); }
+    }
+    .active-flow {
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+    .port-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, monospace;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- Header Superior -->
+  <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="w-9 h-9 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-sky-600/30">
+          IBD
+        </span>
+        <div>
+          <h1 class="text-sm sm:text-base font-semibold text-white tracking-tight">
+            Subsistema de Comunicaciones Embarcado (SysML v2)
+          </h1>
+          <p class="text-xs text-slate-400">
+            Vista 10 (IBD Interno) & Vista 9 (Interconexión Sistema) • UGV Pesado Dual
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+          0 Errores Spec42
+        </span>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-950 text-sky-400 border border-sky-800">
+          Plan PACE 1º-5º
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Selector Interactivo de Modos Plan PACE -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Simulador de Conmutación ante Fallo (Plan PACE)
+          </h2>
+          <p class="text-sm text-slate-300">
+            Selecciona el canal activo para inspeccionar la ruta del flujo de telemando, telemetría y vídeo:
+          </p>
+        </div>
+        <div class="inline-flex flex-wrap gap-1.5 p-1 bg-slate-950 rounded-lg border border-slate-800" id="pace-selector">
+          <button onclick="setPaceLevel(1)" id="btn-pace-1" class="px-3 py-1.5 text-xs font-medium rounded-md transition bg-sky-600 text-white shadow">
+            1º Principal (LOS)
+          </button>
+          <button onclick="setPaceLevel(2)" id="btn-pace-2" class="px-3 py-1.5 text-xs font-medium rounded-md transition text-slate-400 hover:text-slate-200">
+            2º Alternativo (BLOS)
+          </button>
+          <button onclick="setPaceLevel(3)" id="btn-pace-3" class="px-3 py-1.5 text-xs font-medium rounded-md transition text-slate-400 hover:text-slate-200">
+            3º Contingencia (UAV)
+          </button>
+          <button onclick="setPaceLevel(4)" id="btn-pace-4" class="px-3 py-1.5 text-xs font-medium rounded-md transition text-slate-400 hover:text-slate-200">
+            4º Respaldo (CNR)
+          </button>
+          <button onclick="setPaceLevel(5)" id="btn-pace-5" class="px-3 py-1.5 text-xs font-medium rounded-md transition text-slate-400 hover:text-slate-200">
+            5º Failsafe (RGEN-17)
+          </button>
+        </div>
+      </div>
+
+      <!-- Banner de Estado PACE Dinámico -->
+      <div id="pace-status-card" class="mt-4 p-3.5 rounded-lg bg-sky-950/40 border border-sky-800/60 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+          <span class="font-semibold text-sky-300" id="pace-title">1º ORDEN: Enlace Directo LOS 2.4 GHz</span>
+        </div>
+        <div class="flex items-center space-x-4 text-xs text-slate-300">
+          <span><strong>Protocolo:</strong> <span id="pace-proto" class="text-sky-200 font-mono">UDP + micro-DDS con FEC</span></span>
+          <span><strong>Vídeo 360°:</strong> <span id="pace-video" class="text-emerald-400 font-medium">1080p @ 30 fps (6 Mbps)</span></span>
+          <span><strong>Latencia:</strong> <span id="pace-lat" class="text-sky-200 font-mono">&lt; 20 ms</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Dividido: Diagrama Visual IBD + Inspector de Componentes -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Columna 1 y 2: Vista Esquemática IBD Interactiva -->
+      <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+              Topología Completa de Interconexión (IBD)
+            </h3>
+            <p class="text-xs text-slate-400">Haz clic en cualquier bloque o puerto para ver sus especificaciones en SysML v2</p>
+          </div>
+          <div class="flex gap-2 text-[10px]">
+            <span class="px-2 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800">RFPort</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">DataBusPort</span>
+          </div>
+        </div>
+
+        <!-- Render Mermaid Visual SVG -->
+        <div class="bg-slate-950 rounded-lg p-4 border border-slate-800 overflow-x-auto flex-1 flex items-center justify-center min-h-[460px]">
+          <div class="mermaid w-full">
+flowchart TD
+    classDef extNode fill:#1e1e2f,stroke:#6366f1,stroke-width:2px,color:#e2e8f0;
+    classDef partNode fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef safeNode fill:#3b0764,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
+    classDef portNode fill:#0f172a,stroke:#94a3b8,stroke-width:1px,color:#38bdf8;
+
+    subgraph ESTACIONES ["Estaciones Externas y Actores"]
+        CPT["Consola CPT (LOS)"]:::extNode
+        PMP["Puesto Mando PMP (BLOS)"]:::extNode
+        UAV["Relé UAV Cenital"]:::extNode
+        CNR_EXT["Red Táctica VHF Batallón"]:::extNode
+    end
+
+    subgraph UGV ["Plataforma UGV Pesado Dual"]
+        subgraph COMMS ["SubsistemaComunicaciones::SistemaComunicacionesEmbarcado"]
+            ANT["SistemaAntenasEmbarcado<br/>(MIL-STD-810H / Vadeo >= 0.75m)"]:::partNode
+            
+            subgraph RADIOS ["Frente de Radios Tácticas"]
+                RLOS["RadioEnlaceTacticoLOS<br/>(2.4 GHz, RCOM-01)"]:::partNode
+                RBLOS["RadioEnlaceTacticoBLOS<br/>(MANET SDR, RCOM-02)"]:::partNode
+                RCNR["RadioTacticaMilitarCNR<br/>(VHF 30-88 MHz FHSS)"]:::partNode
+            end
+
+            CRYPTO["ModuloCifradoCOMSEC<br/>(AES-256-GCM / Anti-jamming / RCOM-03)"]:::partNode
+            QOS["GestorRedundanciaYQoS<br/>(Plan PACE / Colas QoS RSW-06)"]:::partNode
+            WATCHDOG["SupervisorEnlaceWatchdog<br/>(Heartbeat 200ms / Timeout > 1s)"]:::safeNode
+        end
+
+        subgraph INTERNO ["Subsistemas Internos de A Bordo"]
+            CAM["Cámaras Visión 360° (RGEN-22)"]:::extNode
+            GNC["Computador de Control (GNC)"]:::extNode
+            FRENO["Módulo Frenado Emergencia (RGEN-17)"]:::safeNode
+            SIGILO["Control Modo Sigiloso (RGEN-09)"]:::extNode
+        end
+    end
+
+    %% Conexiones RF Externas
+    CPT <==>|rfPortLOS| ANT
+    PMP <==>|rfPortBLOS| ANT
+    UAV <==>|rfPortBLOS| ANT
+    CNR_EXT <==>|rfPortCNR| ANT
+
+    %% Antena a Transceptores
+    ANT <-->|c_los_to_antena| RLOS
+    ANT <-->|c_blos_to_antena| RBLOS
+    ANT <-->|c_cnr_to_antena| RCNR
+
+    %% Radios a Crypto
+    RLOS <-->|c_crypto_to_los| CRYPTO
+    RBLOS <-->|c_crypto_to_blos| CRYPTO
+    RCNR <-->|c_crypto_to_cnr| CRYPTO
+
+    %% Crypto a QoS
+    CRYPTO <-->|c_qos_to_crypto| QOS
+
+    %% QoS a buses internos
+    CAM -->|entradaVideoTeleoperacion| QOS
+    QOS <-->|dataBus| GNC
+    QOS -->|salidaModoDeteccion| SIGILO
+
+    %% Enlace Watchdog Failsafe directo
+    GNC -.->|c_watchdog_monitor| WATCHDOG
+    WATCHDOG ==>|salidaInhabilitacionFrenado| FRENO
+          </div>
+        </div>
+
+        <!-- Leyenda Inferior -->
+        <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#1e293b] border border-sky-400"></span> Parte SysML</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#3b0764] border border-purple-400"></span> Watchdog / Seguridad</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#1e1e2f] border border-indigo-500"></span> Estación / Subsistema</span>
+          </div>
+          <div class="text-[11px] text-slate-500">
+            Archivo fuente: <code class="text-sky-400">Modelos/05_comunicaciones.sysml</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 3: Inspector de Componente Seleccionado -->
+      <div class="space-y-6">
+        
+        <!-- Tarjeta de Inspección Técnica -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Inspector SysML v2
+            </h3>
+            <span id="inspect-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-400 border border-sky-800">
+              part def
+            </span>
+          </div>
+
+          <div id="inspector-content" class="space-y-4 text-xs">
+            <div>
+              <span class="text-slate-400 block font-mono text-[11px]">Elemento seleccionado:</span>
+              <h4 id="inspect-name" class="text-sm font-bold text-white mt-0.5">GestorRedundanciaYQoS</h4>
+              <p id="inspect-doc" class="text-slate-300 mt-1 leading-relaxed">
+                Planificador de colas QoS y máquina de estados de conmutación ante fallos Plan PACE (RSW-06, RGEN-09).
+              </p>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-800/80">
+              <span class="text-slate-400 block font-semibold text-[11px] uppercase tracking-wider">Atributos Clave:</span>
+              <ul id="inspect-attrs" class="space-y-1.5 font-mono text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800/60">
+                <li><span class="text-sky-400">prioridadTelemando:</span> 1 (Expedited Forwarding)</li>
+                <li><span class="text-sky-400">prioridadVideo:</span> 4 (Best Effort)</li>
+                <li><span class="text-sky-400">tiempoHisteresisRetornoS:</span> 3.0 s</li>
+                <li><span class="text-sky-400">soporteSilencioRadio:</span> true (RGEN-09)</li>
+              </ul>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-800/80">
+              <span class="text-slate-400 block font-semibold text-[11px] uppercase tracking-wider">Puertos Tipados:</span>
+              <div id="inspect-ports" class="grid grid-cols-2 gap-1.5 font-mono text-[10px]">
+                <span class="p-1.5 bg-slate-950 rounded border border-slate-800 text-sky-300">puertoBusEntrada (DataBus)</span>
+                <span class="p-1.5 bg-slate-950 rounded border border-slate-800 text-sky-300">puertoVideoEntrada (DataBus)</span>
+                <span class="p-1.5 bg-slate-950 rounded border border-slate-800 text-sky-300">puertoSalidaCifrado (DataBus)</span>
+                <span class="p-1.5 bg-slate-950 rounded border border-slate-800 text-sky-300">puertoControlEmisiones (DataBus)</span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80">
+              <span class="text-slate-400 block font-semibold text-[11px] uppercase tracking-wider">Requisitos Satisfechos:</span>
+              <div id="inspect-reqs" class="mt-1 flex flex-wrap gap-1">
+                <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-mono text-[10px]">
+                  satisfy RSW-06 (QoS)
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-mono text-[10px]">
+                  satisfy RGEN-09 (Sigilo)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selector Rápido de Componentes a Inspeccionar -->
+          <div class="mt-5 pt-4 border-t border-slate-800">
+            <span class="text-slate-400 block font-semibold text-[11px] uppercase tracking-wider mb-2">Explorar Bloques:</span>
+            <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+              <button onclick="inspectPart('qos')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • GestorRedundanciaYQoS
+              </button>
+              <button onclick="inspectPart('crypto')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • ModuloCifradoCOMSEC
+              </button>
+              <button onclick="inspectPart('watchdog')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • SupervisorWatchdog
+              </button>
+              <button onclick="inspectPart('antenas')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • SistemaAntenas
+              </button>
+              <button onclick="inspectPart('los')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • RadioEnlaceTacticoLOS
+              </button>
+              <button onclick="inspectPart('blos')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • RadioEnlaceTacticoBLOS
+              </button>
+              <button onclick="inspectPart('cnr')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • RadioTacticaMilitarCNR
+              </button>
+              <button onclick="inspectPart('freno')" class="p-1.5 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition truncate">
+                • ModuloFrenadoSeguridad
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Matriz Rápida de Colas de Prioridad QoS (RSW-06) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+            Colas de Calidad de Servicio (RSW-06)
+          </h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between p-2 rounded bg-slate-950 border-l-4 border-rose-500">
+              <div>
+                <span class="font-bold text-white">Prioridad 1 (Crítica)</span>
+                <p class="text-[11px] text-slate-400">Consignas Telemando, Freno, Heartbeat</p>
+              </div>
+              <span class="text-rose-400 font-mono text-[10px]">Expedited Fwd</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-slate-950 border-l-4 border-amber-500">
+              <div>
+                <span class="font-bold text-white">Prioridad 2 (Alta)</span>
+                <p class="text-[11px] text-slate-400">Waypoints C2, Odometría VIO, Obstáculos</p>
+              </div>
+              <span class="text-amber-400 font-mono text-[10px]">Assured Fwd</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-slate-950 border-l-4 border-sky-500">
+              <div>
+                <span class="font-bold text-white">Prioridad 3 (Media)</span>
+                <p class="text-[11px] text-slate-400">Traza Táctica BMS-ET, Telemetría Chasis</p>
+              </div>
+              <span class="text-sky-400 font-mono text-[10px]">Standard Fwd</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-slate-950 border-l-4 border-slate-600">
+              <div>
+                <span class="font-bold text-white">Prioridad 4 (Baja / Degenerable)</span>
+                <p class="text-[11px] text-slate-400">Vídeo 360° H.265 (Apagado en 4º Orden)</p>
+              </div>
+              <span class="text-slate-400 font-mono text-[10px]">Best Effort</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Tabla Completa de Trazabilidad Formal de Requisitos del Pliego -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Matriz de Trazabilidad y Satisfacción Contractual del Pliego
+          </h3>
+          <p class="text-xs text-slate-400">Relaciones formales <code class="text-sky-400">satisfy requirement</code> implementadas en SysML v2</p>
+        </div>
+        <span class="px-2.5 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">
+          7 Requisitos Vinculados
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-mono uppercase text-[11px] bg-slate-950/60">
+              <th class="py-2.5 px-3">Identificador</th>
+              <th class="py-2.5 px-3">Definición Contractual del Pliego</th>
+              <th class="py-2.5 px-3">Componente SysML v2 que Satisface</th>
+              <th class="py-2.5 px-3">Restricción de Verificación (Constraint)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 font-sans text-slate-300">
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RCOM-01</td>
+              <td class="py-2.5 px-3">Enlace táctico en línea de vista (LOS) para telemando con Consola CPT.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">radioEnlaceTacticoLOS</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">latenciaMaximaMs &lt;= 100.0 and alcanceNominalKm &gt;= 1.0</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RCOM-02</td>
+              <td class="py-2.5 px-3">Enlace táctico fuera de línea de vista (BLOS) con PMP y relé UAV cenital.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">radioEnlaceTacticoBLOS</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">alcanceNominalKm &gt;= 5.0 and soporteReleUAV</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RCOM-03</td>
+              <td class="py-2.5 px-3">Cifrado militar hardware COMSEC punto a punto y protección anti-jamming.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">moduloCifradoCOMSEC</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">cifradoHardwareActivo and proteccionAntiJamming</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RSW-06</td>
+              <td class="py-2.5 px-3">Protocolos tácticos con calidad de servicio (QoS) no bloqueante telemando vs vídeo.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">gestorRedundanciaYQoS</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">prioridadTelemando &lt; prioridadVideo</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RGEN-09</td>
+              <td class="py-2.5 px-3">Control y atenuación de emisiones de radio en modo SIGILOSO.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">gestorRedundanciaYQoS</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">soporteSilencioRadio == true</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RGEN-17</td>
+              <td class="py-2.5 px-3">Supervisión continua de latido (heartbeat); frenado automático si pérdida &gt; 1.000 ms.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">supervisorEnlaceWatchdog</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">timeoutFailsafeMs &lt;= 1000.0</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="py-2.5 px-3 font-mono font-bold text-sky-400">RLT1-10</td>
+              <td class="py-2.5 px-3">Estanqueidad y rugerización de antenas en techo ante vadeo sin preparación previa.</td>
+              <td class="py-2.5 px-3 font-mono text-slate-200">sistemaAntenas</td>
+              <td class="py-2.5 px-3 font-mono text-[11px] text-emerald-400">estanqueidadVadeoM &gt;= 0.75</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer con Referencias de Archivos -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-4 mt-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>
+        Proyecto Robótica UGV • SysML v2 / Spec42 • Rama: <code class="text-sky-400">feat/comunicaciones-interconexion-ibd</code>
+      </div>
+      <div>
+        Archivos vinculados: 
+        <a href="../Modelos/05_comunicaciones.sysml" class="text-sky-400 hover:underline">05_comunicaciones.sysml</a> • 
+        <a href="../Modelos/11_vistas.sysml" class="text-sky-400 hover:underline">11_vistas.sysml</a> • 
+        <a href="../Modelos/definicion_protocolos_principales.md" class="text-sky-400 hover:underline">definicion_protocolos_principales.md</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts para Interactividad del Diagrama -->
+  <script>
+    // Datos de los bloques para el Inspector SysML v2
+    const partsData = {
+      qos: {
+        type: "part def",
+        name: "GestorRedundanciaYQoS",
+        doc: "Planificador de colas QoS y máquina de estados de conmutación ante fallos Plan PACE (RSW-06, RGEN-09). Gestiona la histéresis de 3 segundos para evitar rebotes de canal.",
+        attrs: [
+          "planPACE_1_Principal: '1º: Radio LOS 2.4 GHz'",
+          "planPACE_2_Alternativo: '2º: Radio MANET BLOS'",
+          "planPACE_3_Contingencia: '3º: Relé Transpondedor UAV'",
+          "planPACE_4_RespaldoMilitar: '4º: Radio Militar VHF CNR'",
+          "planPACE_5_Emergencia: '5º: Heartbeat Timeout -> Frenado'",
+          "tiempoHisteresisRetornoS: 3.0 s",
+          "prioridadTelemando: 1 (Expedited Forwarding)",
+          "prioridadVideo: 4 (Best Effort)"
+        ],
+        ports: [
+          "puertoBusEntrada (DataBusPort)",
+          "puertoVideoEntrada (DataBusPort)",
+          "puertoSalidaCifrado (DataBusPort)",
+          "puertoControlEmisiones (DataBusPort)"
+        ],
+        reqs: ["RSW-06 (QoS y Protocolos)", "RGEN-09 (Modo Sigiloso)"]
+      },
+      crypto: {
+        type: "part def",
+        name: "ModuloCifradoCOMSEC",
+        doc: "Criptoprocesador hardware militar punto a punto y protección anti-jamming (RCOM-03). Encripta y desencripta flujos antes de pasar a las radios.",
+        attrs: [
+          "algoritmoCifrado: 'AES-256-GCM'",
+          "cifradoHardwareActivo: true",
+          "proteccionAntiJamming: true"
+        ],
+        ports: [
+          "puertoEntradaDatos (DataBusPort)",
+          "puertoDatosLOS (DataBusPort)",
+          "puertoDatosBLOS (DataBusPort)",
+          "puertoDatosCNR (DataBusPort)"
+        ],
+        reqs: ["RCOM-03 (Cifrado COMSEC y Salto FHSS)"]
+      },
+      watchdog: {
+        type: "part def",
+        name: "SupervisorEnlaceWatchdog",
+        doc: "Temporizador de latido (heartbeat) para disparo directo de parada de seguridad failsafe (RGEN-17). Independiente de software ROS2.",
+        attrs: [
+          "periodoHeartbeatMs: 200.0 ms (5 Hz)",
+          "timeoutFailsafeMs: 1000.0 ms (5 pérdidas)",
+          "accionDisparo: 'Orden directa a ModuloFrenadoSeguridad para clavar frenos'"
+        ],
+        ports: [
+          "puertoBusMonitoreo (DataBusPort)",
+          "puertoDisparoFrenado (DataBusPort)"
+        ],
+        reqs: ["RGEN-17 (Failsafe de Frenado Automático)"]
+      },
+      antenas: {
+        type: "part def",
+        name: "SistemaAntenasEmbarcado",
+        doc: "Conjunto de antenas omnidireccionales en techo de barcaza resistentes a vadeo y MIL-STD-810H (RLT1-10).",
+        attrs: [
+          "rugerizacion: 'MIL-STD-810H'",
+          "estanqueidadVadeoM: 0.75 m (sin preparación)"
+        ],
+        ports: [
+          "puertoEntradaLOS / puertoExteriorLOS",
+          "puertoEntradaBLOS / puertoExteriorBLOS",
+          "puertoEntradaCNR / puertoExteriorCNR"
+        ],
+        reqs: ["RLT1-10 (Estanqueidad Vadeo)"]
+      },
+      los: {
+        type: "part def",
+        name: "RadioEnlaceTacticoLOS",
+        doc: "Transceptor de radiofrecuencia táctico para telemando reactivo en línea de vista (RCOM-01) con la Consola CPT.",
+        attrs: [
+          "protocoloTransporte: 'UDP + FEC'",
+          "frecuenciaGhz: 2.4 GHz",
+          "latenciaMaximaMs: 100.0 ms (típica < 20 ms)",
+          "alcanceNominalKm: 1.5 km",
+          "puertoSocket: 5001"
+        ],
+        ports: ["rfPort (RFPort)", "dataBusInternal (DataBusPort)"],
+        reqs: ["RCOM-01 (Enlace Táctico LOS)"]
+      },
+      blos: {
+        type: "part def",
+        name: "RadioEnlaceTacticoBLOS",
+        doc: "Transceptor MANET táctico para mando C2 a larga distancia y relé aéreo con UAV cenital (RCOM-02).",
+        attrs: [
+          "protocoloTransporte: 'STANAG 4586 sobre MANET IP'",
+          "bandaFrecuencia: 'UHF / Banda C militar'",
+          "alcanceNominalKm: 5.0 km",
+          "soporteReleUAV: true",
+          "modulacionSDR: true"
+        ],
+        ports: ["rfPort (RFPort)", "dataBusInternal (DataBusPort)"],
+        reqs: ["RCOM-02 (Enlace Táctico BLOS)"]
+      },
+      cnr: {
+        type: "part def",
+        name: "RadioTacticaMilitarCNR",
+        doc: "Radio de combate militar VHF (PR4G / SDR ESSOR) para red BMS-ET del batallón y canal de respaldo extremo.",
+        attrs: [
+          "protocoloTransporte: 'Telegramas binarios BMS-ET'",
+          "bandaOperacionVhfMhz: 30.0 MHz (30-88 MHz)",
+          "saltoFrecuenciaActivo: true (FHSS)",
+          "difraccionTerrestreActiva: true",
+          "politicaVideo: 'Video 100% apagado (0 Mbps)'"
+        ],
+        ports: ["rfPort (RFPort)", "dataBusInternal (DataBusPort)"],
+        reqs: ["RSW-06 (Priorización no bloqueante)"]
+      },
+      freno: {
+        type: "part def",
+        name: "ModuloFrenadoSeguridad",
+        doc: "Actuador de frenos mecánicos y de estacionamiento ubicado en el subsistema de tren de rodaje / GNC.",
+        attrs: [
+          "tipoFreno: 'Discos mecánicos con muelle negativo'",
+          "tiempoRespuestaMs: '< 80 ms'",
+          "accionamiento: 'Línea hardware redundante failsafe'"
+        ],
+        ports: ["puertoInhabilitacion (DataBusPort)"],
+        reqs: ["RGEN-17 (Parada de emergencia)"]
+      }
+    };
+
+    function inspectPart(key) {
+      const data = partsData[key];
+      if (!data) return;
+
+      document.getElementById("inspect-badge").textContent = data.type;
+      document.getElementById("inspect-name").textContent = data.name;
+      document.getElementById("inspect-doc").textContent = data.doc;
+
+      const attrsContainer = document.getElementById("inspect-attrs");
+      attrsContainer.innerHTML = data.attrs.map(a => {
+        const parts = a.split(":");
+        return `<li><span class="text-sky-400">${parts[0]}:</span>${parts.slice(1).join(":")}</li>`;
+      }).join("");
+
+      const portsContainer = document.getElementById("inspect-ports");
+      portsContainer.innerHTML = data.ports.map(p => {
+        return `<span class="p-1.5 bg-slate-950 rounded border border-slate-800 text-sky-300">${p}</span>`;
+      }).join("");
+
+      const reqsContainer = document.getElementById("inspect-reqs");
+      reqsContainer.innerHTML = data.reqs.map(r => {
+        return `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-mono text-[10px]">satisfy ${r}</span>`;
+      }).join("");
+    }
+
+    // Datos de la simulación PACE
+    const paceLevels = {
+      1: {
+        title: "1º ORDEN: Enlace Directo LOS 2.4 GHz (Consola CPT)",
+        proto: "UDP + micro-DDS con FEC",
+        video: "1080p @ 30 fps (6.0 Mbps)",
+        lat: "< 20 ms",
+        bg: "bg-sky-950/40",
+        border: "border-sky-800/60",
+        textColor: "text-sky-300"
+      },
+      2: {
+        title: "2º ORDEN: Enlace MANET BLOS (Puesto de Mando PMP)",
+        proto: "STANAG 4586 / JAUS sobre IP",
+        video: "1080p Bitrate Adaptativo (3-6 Mbps)",
+        lat: "< 150 ms",
+        bg: "bg-indigo-950/40",
+        border: "border-indigo-800/60",
+        textColor: "text-indigo-300"
+      },
+      3: {
+        title: "3º ORDEN: Relé Aéreo con Transpondedor UAV Cenital",
+        proto: "STANAG 4586 sobre UAV Relé",
+        video: "720p @ 15 fps Comprimido (1.5 Mbps)",
+        lat: "< 200 ms",
+        bg: "bg-cyan-950/40",
+        border: "border-cyan-800/60",
+        textColor: "text-cyan-300"
+      },
+      4: {
+        title: "4º ORDEN: Radio Táctica Militar VHF CNR (Respaldo)",
+        proto: "Telegramas BMS-ET / SIMACET (FHSS)",
+        video: "VÍDEO 100% APAGADO (0 Mbps)",
+        lat: "< 350 ms",
+        bg: "bg-amber-950/40",
+        border: "border-amber-800/60",
+        textColor: "text-amber-300"
+      },
+      5: {
+        title: "5º ORDEN: Pérdida Total de Enlace -> Failsafe Frenado RGEN-17",
+        proto: "Señal Hardware Directa a Frenos",
+        video: "INMÓVIL / FRENADO BLOQUEADO",
+        lat: "Timeout > 1.000 ms",
+        bg: "bg-rose-950/40",
+        border: "border-rose-800/60",
+        textColor: "text-rose-300"
+      }
+    };
+
+    function setPaceLevel(lvl) {
+      // Actualizar botones
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`btn-pace-${i}`);
+        if (i === lvl) {
+          btn.className = "px-3 py-1.5 text-xs font-medium rounded-md transition bg-sky-600 text-white shadow";
+        } else {
+          btn.className = "px-3 py-1.5 text-xs font-medium rounded-md transition text-slate-400 hover:text-slate-200";
+        }
+      }
+
+      // Actualizar banner
+      const data = paceLevels[lvl];
+      const card = document.getElementById("pace-status-card");
+      card.className = `mt-4 p-3.5 rounded-lg ${data.bg} border ${data.border} text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2`;
+      
+      document.getElementById("pace-title").textContent = data.title;
+      document.getElementById("pace-title").className = `font-semibold ${data.textColor}`;
+      document.getElementById("pace-proto").textContent = data.proto;
+      document.getElementById("pace-video").textContent = data.video;
+      document.getElementById("pace-lat").textContent = data.lat;
+
+      // Sincronizar inspector con el componente clave de ese nivel
+      if (lvl === 1) inspectPart('los');
+      else if (lvl === 2) inspectPart('blos');
+      else if (lvl === 3) inspectPart('blos');
+      else if (lvl === 4) inspectPart('cnr');
+      else if (lvl === 5) inspectPart('watchdog');
+    }
+  </script>
+</body>
+</html>

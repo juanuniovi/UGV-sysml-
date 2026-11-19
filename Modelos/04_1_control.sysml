@@ -212,8 +212,5 @@ package SubsistemaControl {
         // Accion local de generacion de consignas de control y frenado
         perform action generarControlAutonomo : GenerarControlAutonomo;
 
-        // Satisfaccion formal de requisitos en SistemaControl
-        satisfy ReqModoTeleoperado by gobiernoControl;
-        satisfy ReqSubmodosNavegacionAutonoma by computadorAutonomia;
     }
 }

@@ -283,7 +283,5 @@ package SubsistemaNavegacion {
         perform action configurarModoDeteccion : ConfigurarModoDeteccion;
         perform action detectarObstaculos : DetectarObstaculosNavegacion;
 
-        // Satisfaccion formal de requisitos en SistemaNavegacion (ROPE-06)
-        satisfy ReqDeteccionEvasionObstaculos by moduloDeteccionEvasion;
     }
 }
