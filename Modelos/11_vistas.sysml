@@ -17,7 +17,6 @@ package VistasUGV {
     private import ComportamientoUGV::*;
 
 
-
     // Vista 2: Estructura interna de la Plataforma Vehículo UGV (equivalente a BDD)
     view vistaEstructuraPlataforma : GeneralView {
         doc /* Muestra la descomposición interna de la plataforma terrestre (Barcaza, Rodaje, Planta Motriz, GNC y Comunicaciones) */
