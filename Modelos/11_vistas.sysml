@@ -16,13 +16,7 @@ package VistasUGV {
     private import SistemaUGV::*;
     private import ComportamientoUGV::*;
 
-    // Vista 1: Estructura general del Sistema de Interés Completo - SoI (equivalente a BDD)
-    view vistaEstructuraSoI : GeneralView {
-        doc /* Muestra la jerarquía de partes y puertos del Sistema UGV Pesado Dual completo (Vehículo + PMP + CPT + UAV + Carga de Pago) */
-        expose SistemaUGVPesadoDual;
-        filter @SysML::PartUsage or @SysML::PartDefinition
-            or @SysML::PortUsage or @SysML::PortDefinition;
-    }
+
 
     // Vista 2: Estructura interna de la Plataforma Vehículo UGV (equivalente a BDD)
     view vistaEstructuraPlataforma : GeneralView {
