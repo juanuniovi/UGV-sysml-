@@ -21,32 +21,38 @@ Motor HVO ──► Generador ──► Bus de potencia ──► Tracción (mot
 
 ## 📍 Punto de partida: qué hay hoy en `03_planta_motriz.sysml`
 
+*(Actualizado el 2026-11-19)*
+
 | Elemento | Estado actual | Qué falta |
 | :--- | :--- | :--- |
-| `PlantaMotrizHibrida` | Existe con 6 partes | Las partes **no tienen tipo** (`part def`), ni atributos, ni puertos propios |
-| Puertos de contorno (`chassisMount`, `powerOutputTraction`, `powerOutputAvionics`, `powerOutputPayload`, `controlBus`) | Existen y ya están conectados en `09_sistema_ugv.sysml` | Conectarlos por dentro con las partes internas |
+| **Caja negra** (subpaquete `CajaNegraPlantaMotriz`) | ✅ Necesidades, contexto con 11 interfaces externas, 8 casos de uso, 3 secuencias y MoEs (cambio `planta-motriz-caja-negra`) | Vistas (diagramas) en un cambio posterior |
+| `PlantaMotrizHibrida` (caja blanca) | ✅ 8 `part def` tipadas, conexiones internas y vistas 10, 11 y 12 | Atributos de dimensionado (Fase 2) |
+| Puertos de contorno (`chassisMount`, `powerOutputTraction`, `powerOutputAvionics`, `powerOutputPayload`, `controlBus`) | ✅ Conectados por dentro y en `09_sistema_ugv.sysml` | Reconciliarlos con los puertos de la caja negra |
 | `ReqPotenciaMinimaPlataforma` (`RLT1-09`, ≥ 140 kW) | Definido | **No tiene `satisfy`** |
-| `ReqExportacionEnergia` (`RGEN-19`, 120 kW) | Restricción vacía `{ true }` | Restricción real y `satisfy` |
+| `ReqExportacionEnergia` (`RGEN-19`, 120 kW) | Restricción vacía `{ true }` | Restricción real, `satisfy` y rotularlo como **OPCIONAL** (así figura en el pliego) |
 | `capacidadBateriaKWh : Real` | Sin tipo de `TiposBase` | Tipar con una magnitud de energía |
-| Especificación OpenSpec | No existe `openspec/specs/planta-motriz/` | Crearla al archivar el primer cambio |
+| Especificaciones OpenSpec | ✅ `openspec/specs/planta-motriz/` | `planta-motriz-caja-negra` se crea al archivar el cambio |
 
 ---
 
 ## 📋 Matriz de Requisitos Relacionados con la Planta Motriz
 
-> ⚠️ **Pendiente de confirmar con el pliego**: los textos marcados con *(a confirmar)* se han deducido de los comentarios del modelo y deben contrastarse con `docs/curso_ROBOT_TERRESTRE_Anexo_I.pdf` (sección de requisitos generales `RGEN-11..19` y `RLT1-09`) antes de la propuesta OpenSpec. Recuerda que, según `AGENTS.md`, el agente solo puede abrir ese PDF con tu autorización expresa.
+> ✅ **Auditado contra el pliego el 2026-11-19** (`docs/ROBOT_TERRESTRE_Anexo_I.pdf`, §3.1 y §3.2.1, con autorización expresa). `RGEN-11` y `RGEN-13` quedan confirmados. Correcciones: `RGEN-19` es **[OPCIONAL]**; `RGEN-14` y `RGEN-15` dicen «8 h **o** 400 km» y «2 h **o** 100 km»; y el remolque es solo `RGEN-10` (`RLT1-14` no trata del remolque). Además, `RGEN-12` (recarga por motor y por frenada), `RGEN-16` (ser remolcado a 65 km/h) y `RGEN-18` (**[OPCIONAL]** recarga enchufable) también afectan a la planta.
 
 | Código | Resumen | ¿Por qué afecta a la planta motriz? | ¿Cómo lo resolvemos en SysML v2? |
 | :--- | :--- | :--- | :--- |
 | **`RLT1-09`** | Potencia combinada de propulsión ≥ 140 kW | Es la potencia que la planta debe poder entregar a las ruedas. | Atributo `potenciaNominalKW : Potencia` + `satisfy ReqPotenciaMinimaPlataforma`. |
-| **`RGEN-19`** | Exportación de energía a consumidores externos ≥ 120 kW | La planta debe tener una salida de potencia hacia equipos externos. | `part def ModuloExportacionPotencia` con `potenciaExportacionContinuaKW` + restricción `>= 120.0` y `satisfy`. |
-| **`RGEN-11`** *(a confirmar)* | Motor térmico compatible con biocombustible HVO 100 % | Define el tipo de motor de combustión. | `part def MotorCombustionBiocombustible` con atributo de combustible admitido. |
-| **`RGEN-13`** *(a confirmar)* | Operación puramente eléctrica con baterías | Exige que las baterías puedan mover el vehículo sin el motor. | `part def PackBateriasTraccion` con capacidad y potencia de descarga. |
+| **`RGEN-19`** | **[OPCIONAL]** Exportación de energía a consumidores externos ≥ 120 kW | La planta debe tener una salida de potencia hacia equipos externos. | `part def ModuloExportacionPotencia` con `potenciaExportacionContinuaKW` + restricción `>= 120.0` y `satisfy`. |
+| **`RGEN-11`** | Propulsión híbrida (baterías + motor eléctrico + motor de combustión) con biocombustible 100 % | Define el tipo de motor de combustión. | `part def MotorCombustionBiocombustible` con atributo de combustible admitido. |
+| **`RGEN-12`** | Baterías recargables por el motor de combustión y por la frenada regenerativa | Define de dónde sale la energía de recarga en marcha. | Necesidad, caso de uso UC3 y MoE en la caja negra. |
+| **`RGEN-13`** | Modo puramente eléctrico, sin motor de combustión, con firma térmica y acústica reducida | Exige que las baterías puedan mover el vehículo sin el motor. | `part def PackBateriasTraccion` con capacidad y potencia de descarga. |
+| **`RGEN-16`** | Ser remolcado por otros vehículos a ≥ 65 km/h | La planta debe quedar inactiva sin estorbar el remolcado. | Caso de uso UC8 en la caja negra. |
+| **`RGEN-18`** | **[OPCIONAL]** Movilidad híbrida enchufable | Requiere una entrada de recarga externa. | Interfaz `recargaExterna`, UC6 y MoE objetivo en la caja negra. |
 | **`RGEN-14`** | Autonomía total ≥ 8 h o 400 km | Depende del depósito de combustible y del consumo. | Ya está a nivel `PlataformaUGV`; la planta aporta atributos (depósito, consumo) que lo justifican. |
 | **`RGEN-15`** | Autonomía eléctrica ≥ 2 h o 100 km | Depende de la capacidad de la batería. | Ya está a nivel `PlataformaUGV`; la planta aporta `capacidadBateriaKWh`. |
 | **`RGEN-09`** | Modos NORMAL / SIGILOSO | En sigiloso el motor térmico se apaga y todo va por baterías. | El PMS recibe el modo por `controlBus`; enlace con `ModoSigiloso` de `10_comportamiento.sysml`. |
 | **`RLT1-01`, `RLT1-04`** | Tracción eléctrica independiente por rueda | Los motores de rueda ya están en el tren de rodaje: la planta solo les da energía. | Interfaz `powerOutputTraction` → `rodaje.powerInput` (ya existe). |
-| **`RGEN-10`, `RLT1-14`** | Arrastre de remolque ≥ 3.000 kg | Aumenta la potencia demandada en tracción. | Se tiene en cuenta al justificar la potencia nominal (sin requisito nuevo). |
+| **`RGEN-10`** | Arrastre de remolque ≥ 3.000 kg (en el pliego, `RLT1-14` no trata del remolque) | Aumenta la potencia demandada en tracción. | Se tiene en cuenta al justificar la potencia nominal (sin requisito nuevo). |
 | **`RLT1-08`** | Masa en orden de misión ≤ 9.000 kg | Motor, generador y baterías son de lo más pesado del vehículo. | Atributo `masaSubsistemaKg : Masa` como presupuesto de masa. |
 | **`RGEN-06`** | Resistencia ambiental | Refrigeración y estanqueidad de motor y baterías. | Comentario/atributos de rugerización en las partes exteriores. |
 | **`RLT1-10`** | Vadeo ≥ 0,75 m | Admisión de aire del motor y cofre de baterías no deben inundarse. | Atributo de cota de admisión / estanqueidad en el `chassisMount`. |
@@ -92,7 +98,7 @@ Motor HVO ──► Generador ──► Bus de potencia ──► Tracción (mot
 1. ✅ **¿Dónde viven los motores eléctricos de tracción?** *(resuelto el 2026-11-12)*  
    Estaban duplicados: en la planta (`motoresElectricosTraccion[1..*]`) y en el tren de rodaje (`RuedaTraccionIndependiente`).  
    👉 **Decisión**: se quedan en el tren de rodaje y se **quitan** de la planta. La planta solo entrega energía por `powerOutputTraction` (arquitectura híbrida serie).
-2. **Numeración `RGEN-13` vs `RGEN-15`** en el comentario de `packBateriasTraccion` (línea 13): el comentario dice «autonomía silenciosa ≥ 2 h (`RGEN-13`)», pero en el resto del modelo esa autonomía es `RGEN-15`. Corregir con el pliego delante.
+2. **Numeración `RGEN-13` vs `RGEN-15`** en el comentario de `packBateriasTraccion`: el comentario dice «autonomía silenciosa ≥ 2 h (`RGEN-13`)». Ya está confirmado con el pliego que esa autonomía es **`RGEN-15`** (`RGEN-13` es el modo puramente eléctrico). Pendiente de corregir en un cambio propio.
 3. **Tipo para la energía (kWh)**: `TiposBase` no tiene magnitud de energía. Habrá que añadir `attribute def Energia :> Real;` en `00_tipos_base.sysml` (archivo compartido: avisar al equipo).
 4. **Cifras de diseño** (potencia del motor, capacidad de batería, depósito…): se fijan en la Fase 2, justificadas con los requisitos, sin inventar valores que contradigan el pliego.
 
@@ -101,7 +107,9 @@ Motor HVO ──► Generador ──► Bus de potencia ──► Tracción (mot
 ## 🗺️ Mapa de Fases Incrementales
 
 ```
-[Fase 1: Estructura General y Conexiones (bloques + flujos + vistas)]  <--- EN CURSO (cambio OpenSpec planta-motriz-estructura-general)
+[Fase 0: Caja Negra (necesidades + contexto + casos de uso + MoEs)]    <--- EN CURSO (cambio OpenSpec planta-motriz-caja-negra; vistas pendientes)
+   │
+[Fase 1: Estructura General y Conexiones (bloques + flujos + vistas)]  <--- COMPLETADA (archivada el 2026-11-12, planta-motriz-estructura-general)
    │
    ├──> [Fase 2: Detalle de Componentes (parámetros técnicos y requisitos)]
    │
@@ -114,7 +122,23 @@ Motor HVO ──► Generador ──► Bus de potencia ──► Tracción (mot
 
 ---
 
-## 📌 Fase 1 (En curso): Estructura General y Conexiones
+## ⬛ Fase 0 (En curso): Caja Negra (*Black Box*)
+
+Según el enfoque del profesor: **structure → contexto del sistema; behaviour → casos de uso; parameters → MoEs**, más las necesidades de las partes interesadas. Todo está en el subpaquete `CajaNegraPlantaMotriz`, al final de `03_planta_motriz.sysml`.
+
+- **Requirements**: 4 partes interesadas y 12 necesidades `Nec...`, trazadas al pliego.
+- **Structure**: `PlantaMotrizCajaNegra` con 11 interfaces externas (energía, materia, mecánica e información) y `ContextoPlantaMotriz` con actores, sistemas externos y entorno.
+- **Behavior**: casos de uso `UC1` a `UC8`, con precondiciones, postcondiciones, escenario principal y excepciones, y secuencias de UC1, UC2 y UC5.
+- **Parameters**: MoEs marcadas con `@MedidaEfectividad`, la tabla `MoEsPlantaMotriz` (umbral y objetivo) y los requisitos `Umbral...`.
+
+**Pendiente:**
+- Vistas (diagramas) de la caja negra, en un cambio posterior.
+- Reconciliar la caja negra con la caja blanca (`PlantaMotrizHibrida :> PlantaMotrizCajaNegra`, puertos y `satisfy`).
+- Avisar a los responsables de otros archivos de las discrepancias con el pliego: `and` en las autonomías de `09_sistema_ugv.sysml`, `RLT1-14` en `ReqCapacidadArrastreRemolque` y la mezcla de `RGEN-09` con `RGEN-13` en `ModoSigiloso` (`10_comportamiento.sysml`).
+
+---
+
+## 📌 Fase 1 (Completada): Estructura General y Conexiones
 
 ### Meta
 Sustituir la lista de nombres por bloques tipados, **conectados entre sí** y con los puertos de contorno, sin atributos de dimensionado todavía.
