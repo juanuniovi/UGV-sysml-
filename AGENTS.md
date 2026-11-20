@@ -68,3 +68,18 @@ Para evitar la propagación pasiva de errores o valores provisionales arrastrado
 - No uses ni reactives Docker, WSL, PostgreSQL o Eclipse SysON; su contenido en `residuos/` es histórico.
 
 Una corrección tipográfica sin impacto semántico puede omitir la propuesta completa, pero nunca la rama dedicada.
+
+## Lecciones aprendidas y reglas preventivas
+
+### Satisfacción única de requisitos
+Cada requisito se satisface en un único nivel jerárquico. Si una definición de parte ya satisface un requisito internamente (`satisfy requirement : Req;`), no se repite en el contenedor con `satisfy requirement : Req by <parte>;`, y viceversa. Antes de añadir un `satisfy`, busca el requisito en `Modelos/*.sysml` y comprueba que no esté ya satisfecho.
+
+*Origen (2026-11-20)*: `RGEN-20` estaba satisfecho dentro de `SistemaIluminacion` y otra vez en `PlataformaUGV` (`by iluminacion`). `spec42 check` no daba errores, pero las vistas que exponían la plataforma completa no se renderizaban (`diagram occurrence is outside the projected node set`).
+
+### Validación de vistas con Spec42
+La validación con Spec42 no termina en `spec42 check Modelos`: renderiza también todas las vistas (`spec42 diagram Modelos` para listarlas y `spec42 diagram Modelos --view <vista>` para cada una). Un cambio no está validado si alguna vista no se renderiza.
+
+### Configuración compartida portable
+Los archivos versionados (`.vscode/`, `openspec/config.yaml`, scripts) no contienen rutas absolutas ni dependientes de un usuario o equipo (por ejemplo, `C:\Users\<usuario>\...`). Las rutas locales van en la configuración de usuario del editor, fuera del repositorio.
+
+*Origen (2026-11-20)*: `.vscode/settings.json` fijaba `spec42.serverPath` al perfil `Usuario` de un solo equipo; en el resto, Spec42 no arrancaba (`spawn ... ENOENT`). La extensión localiza su propio servidor sin necesidad de esa clave.
