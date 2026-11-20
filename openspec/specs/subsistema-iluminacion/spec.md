@@ -21,11 +21,15 @@ El bloque `SistemaIluminacion` SHALL ejecutar la acción `Iluminar360Grados` (`i
 - **THEN** se modula la salida de emisión perimetral activa en 360 grados para dar apoyo visual al UGV
 
 ### Requirement: Trazabilidad formal del requisito RGEN-20 y satisfacción por SistemaIluminacion
-El paquete `SubsistemaIluminacion` SHALL definir el requisito trazable `ReqConscienciaSituacionalIluminacion360` (`RGEN-20`), estableciendo `subject ilum : SistemaIluminacion` y una relación formal de satisfacción directa dentro de `SistemaIluminacion`, sin delegar en subpartes huérfanas.
+El paquete `SubsistemaIluminacion` SHALL definir el requisito trazable `ReqConscienciaSituacionalIluminacion360` (`RGEN-20`), estableciendo `subject ilum : SistemaIluminacion` y una relación formal de satisfacción directa dentro de `SistemaIluminacion`, sin delegar en subpartes huérfanas. Dicha satisfacción SHALL ser única en el modelo: `PlataformaUGV` (`Modelos/09_sistema_ugv.sysml`) MUST NOT declarar una segunda satisfacción `satisfy requirement : ReqConscienciaSituacionalIluminacion360 by iluminacion;`, ya que la satisfacción se hereda a través de `part iluminacion : SistemaIluminacion` y la duplicidad impide a Spec42 renderizar las vistas de interconexión que exponen la plataforma completa.
 
 #### Scenario: Verificación de trazabilidad del requisito RGEN-20
 - **WHEN** se examinan los requisitos del subsistema de iluminación en Spec42 o en `vistaRequisitos`
 - **THEN** `ReqConscienciaSituacionalIluminacion360` aparece vinculado y satisfecho formalmente por el bloque `SistemaIluminacion` bajo la referencia `RGEN-20`
+
+#### Scenario: Satisfacción única y renderizado de vistas de interconexión
+- **WHEN** se busca `ReqConscienciaSituacionalIluminacion360` en las cláusulas `satisfy` de `Modelos/*.sysml` y se renderizan `vistaConexionesSoI`, `vistaConexionesPlataforma` y `vistaConexionesComunicaciones`
+- **THEN** existe una única cláusula `satisfy`, ubicada en `SistemaIluminacion`, y las tres vistas se renderizan sin el aviso `diagram occurrence is outside the projected node set`
 
 ### Requirement: Integración de SistemaIluminacion en PlataformaUGV con enlace a Comunicaciones
 El modelo SHALL integrar `part iluminacion : SistemaIluminacion;` dentro de `PlataformaUGV` (`Modelos/09_sistema_ugv.sysml`), conectando sus puertos con la planta motriz para suministro de energía (`c_power_iluminacion connect plantaMotriz.powerOutputAvionics to iluminacion.powerInput;`) y con el subsistema de Control para el gobierno de intensidad (`c_control_iluminacion connect control.salidaIntensidad to iluminacion.entradaIntensidad;`), prescindiendo de fijaciones mecánicas a barcaza en este subsistema, y exponiendo la conexión en `Modelos/11_vistas.sysml` dentro de `vistaEstructuraNavegacionControl` y `vistaConexionesNavegacionControl`.
