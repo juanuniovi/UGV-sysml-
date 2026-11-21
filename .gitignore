@@ -22,5 +22,12 @@ build/
 # Notas y planes de trabajo personales de desarrollo
 plan_desarrollo_tren_rodaje.md
 quehacer.md
-plan_desarrollo_comunicaciones.pdf
+plan_desarrollo_comunicaciones.*
+Modelos/plan_desarrollo_comunicaciones.md
+
+# Documentación, presentaciones y guiones personales de comunicaciones
+docs/explicacion_vistas_comunicaciones.*
+docs/presentacion_comunicaciones.*
+docs/guion_presentacion_comunicaciones.*
+docs/guia_paso_a_paso_vistas.*
 

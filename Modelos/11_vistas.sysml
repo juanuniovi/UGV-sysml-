@@ -28,13 +28,53 @@ package VistasUGV {
     // Vista 3: Interconexiones del Sistema de Interés Completo - SoI (equivalente a IBD)
     view vistaConexionesSoI : InterconnectionView {
         doc /* Muestra los enlaces RF tácticos, acople de cargas de pago y conexiones del UAV cenital con el vehículo */
-        expose SistemaUGVPesadoDual;
+        expose SistemaUGV::SistemaUGVPesadoDual::puestoMando;
+        expose SistemaUGV::SistemaUGVPesadoDual::consolaCPT;
+        expose SistemaUGV::SistemaUGVPesadoDual::uavCenital;
+        expose SistemaUGV::SistemaUGVPesadoDual::cargaPagoMision;
+        expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::control;
+        expose SistemaUGV::PlataformaUGV::plantaMotriz;
+        expose SistemaUGV::PlataformaUGV::barcaza;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_rf_blos;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_rf_los;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_rf_uav;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_payload_mount;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_payload_power;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_payload_data;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_uav_landing;
+        expose SistemaUGV::SistemaUGVPesadoDual::c_uav_power;
     }
 
     // Vista 4: Interconexiones internas de la Plataforma Vehículo UGV (equivalente a IBD)
     view vistaConexionesPlataforma : InterconnectionView {
         doc /* Muestra las conexiones mecánicas sobre barcaza, distribución eléctrica y buses de datos internos del vehículo */
-        expose PlataformaUGV;
+        expose SistemaUGV::PlataformaUGV::barcaza;
+        expose SistemaUGV::PlataformaUGV::rodaje;
+        expose SistemaUGV::PlataformaUGV::plantaMotriz;
+        expose SistemaUGV::PlataformaUGV::control;
+        expose SistemaUGV::PlataformaUGV::navegacion;
+        expose SistemaUGV::PlataformaUGV::comunicaciones;
+        expose SistemaUGV::PlataformaUGV::iluminacion;
+        expose SistemaUGV::PlataformaUGV::c_barcaza_rodaje;
+        expose SistemaUGV::PlataformaUGV::c_barcaza_powertrain;
+        expose SistemaUGV::PlataformaUGV::c_barcaza_control;
+        expose SistemaUGV::PlataformaUGV::c_barcaza_navegacion;
+        expose SistemaUGV::PlataformaUGV::c_power_traction;
+        expose SistemaUGV::PlataformaUGV::c_power_control;
+        expose SistemaUGV::PlataformaUGV::c_power_navegacion;
+        expose SistemaUGV::PlataformaUGV::c_power_comms;
+        expose SistemaUGV::PlataformaUGV::c_power_iluminacion;
+        expose SistemaUGV::PlataformaUGV::c_bus_comms_control;
+        expose SistemaUGV::PlataformaUGV::c_drive_by_wire;
+        expose SistemaUGV::PlataformaUGV::c_pms_control;
+        expose SistemaUGV::PlataformaUGV::c_control_iluminacion;
+        expose SistemaUGV::PlataformaUGV::c_nav_obstaculos_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_nav_vio_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_comms_modo_nav;
+        expose SistemaUGV::PlataformaUGV::c_comms_frenado_ctrl;
+        expose SistemaUGV::PlataformaUGV::c_nav_video_comms;
+        expose SistemaUGV::PlataformaUGV::c_nav_rodaje_comms;
     }
 
     // Vista 5: Requisitos recopilados automáticamente de todos los paquetes del UGV
@@ -105,7 +145,6 @@ package VistasUGV {
         expose SistemaUGV::SistemaUGVPesadoDual::puestoMando;
         expose SistemaUGV::SistemaUGVPesadoDual::consolaCPT;
         expose SistemaUGV::SistemaUGVPesadoDual::uavCenital;
-        expose SistemaUGV::SistemaUGVPesadoDual::vehiculo;
         expose SistemaUGV::SistemaUGVPesadoDual::c_rf_los;
         expose SistemaUGV::SistemaUGVPesadoDual::c_rf_blos;
         expose SistemaUGV::SistemaUGVPesadoDual::c_rf_uav;
@@ -157,3 +196,4 @@ package VistasUGV {
         expose SistemaUGV::SistemaUGVPesadoDual::c_uav_power;
     }
 }
+
