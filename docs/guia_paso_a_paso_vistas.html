@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Explicación de las Vistas de Comunicaciones: Partes, Puertos y Conexiones</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-light: #e0f2fe;
+      --primary-dark: #0369a1;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #090d16;
+      --highlight: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      margin: 0;
+      padding: 30px 20px;
+    }
+    .wrapper {
+      max-width: 950px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--highlight);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 12px;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--highlight);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+    p { margin-bottom: 14px; color: #cbd5e1; }
+    .diagram-box {
+      background: var(--code-bg);
+      color: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 18px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+    }
+    th {
+      background-color: #0d1527;
+      color: var(--highlight);
+      font-weight: 700;
+    }
+    tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.02); }
+    .part-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--highlight);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+    .part-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .part-desc {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .summary-box {
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    .summary-box h3 {
+      color: var(--highlight);
+      margin-top: 0;
+    }
+    .summary-box ol {
+      margin-left: 20px;
+      color: #e2e8f0;
+      font-size: 14.5px;
+    }
+    .summary-box li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <span class="badge">Ingeniería de Sistemas / SysML v2</span>
+  <h1>Explicación de las Vistas de Comunicaciones: Partes, Puertos y Conexiones</h1>
+  <p><strong>Autor:</strong> Pelayo Pache Rodríguez | <strong>Sistema:</strong> UGV Pesado Dual de Combate</p>
+
+  <p>Este documento explica de forma directa y sin rodeos <strong>qué partes existen en las vistas de comunicaciones</strong>, qué puertos tienen y cómo están conectadas físicamente entre sí a través de sus cables y enlaces.</p>
+
+  <!-- SECCIÓN 1: VISTA 9 -->
+  <h2>1. Vista 9: <code>vistaConexionesComunicaciones</code> (El UGV con el Exterior)</h2>
+  <p>Esta vista muestra el vehículo UGV en el centro del campo de batalla hablando con las 3 estaciones remotas y entregando las órdenes al computador de a bordo.</p>
+
+  <div class="diagram-box">
+ [ CONSOLA CPT ]                   [ PUESTO PMP ]                   [ DRON UAV ]
+ (Operador a pie)                (Puesto de mando)                (Dron en techo)
+   [rfPortLOS]                     [rfPortBLOS]                    [rfPortRelay]
+        │                               │                               │
+        │ c_rf_los                      │ c_rf_blos                     │ c_rf_uav
+        ▼                               ▼                               ▼
+  [rfPortLOS]                     [rfPortBLOS]                    [rfPortBLOS]
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │  SUBSISTEMA DE COMUNICACIONES (dentro del UGV)                              │
+ │                                                                             │
+ │            [dataBus]                        [salidaInhabilitacionFrenado]   │
+ └────────────────┬──────────────────────────────────────────┬─────────────────┘
+                  │ c_bus_comms_control                      │ c_comms_frenado_ctrl
+                  ▼                                          ▼
+              [dataBus]                        [entradaInhabilitacionFrenado]  
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │  SUBSISTEMA DE CONTROL (GNC) (dentro del UGV)                               │
+ └─────────────────────────────────────────────────────────────────────────────┘</div>
+
+  <h3>Partes que aparecen en esta vista:</h3>
+  <div class="part-card">
+    <div class="part-title">1. <code>consolaCPT</code> (Consola Portátil Ligera)</div>
+    <div class="part-desc">El mando tipo tablet con joysticks que lleva el operador desmontado que va a pie cerca del UGV. Tiene el puerto de radio <code>rfPortLOS</code>.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">2. <code>puestoMando</code> (PMP)</div>
+    <div class="part-desc">El puesto de mando a distancia (&ge; 5 km), como un camión o puesto blindado C2. Tiene el puerto de radio de largo alcance <code>rfPortBLOS</code>.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">3. <code>uavCenital</code> (Dron Aéreo)</div>
+    <div class="part-desc">El dron cautivo guardado en el techo de la barcaza del UGV que sube a hacer de repetidor aéreo si hay montañas. Tiene el puerto <code>rfPortRelay</code>.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">4. <code>vehiculo</code> (Plataforma UGV)</div>
+    <div class="part-desc">El vehículo terrestre en sí. Dentro de él se exponen dos cajas clave:
+      <ul>
+        <li><strong><code>comunicaciones</code>:</strong> Tu subsistema embarcado receptor.</li>
+        <li><strong><code>control</code>:</strong> El computador que mueve el volante, acelerador y frenos.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Tabla de Conexiones de la Vista 9 (¿Qué une cada cable?):</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Cable / Conector</th>
+        <th>De dónde sale (Origen)</th>
+        <th>A dónde llega (Destino)</th>
+        <th>¿Qué transporta exactamente?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong><code>c_rf_los</code></strong></td>
+        <td><code>consolaCPT.rfPortLOS</code></td>
+        <td><code>vehiculo.comunicaciones.rfPortLOS</code></td>
+        <td><strong>Radio directa 2.4 GHz (1º Orden PACE):</strong> Consignas de joystick de la consola hacia el UGV y vídeo de las cámaras hacia la pantalla (latencia &lt; 20 ms, RCOM-01).</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_rf_blos</code></strong></td>
+        <td><code>puestoMando.rfPortBLOS</code></td>
+        <td><code>vehiculo.comunicaciones.rfPortBLOS</code></td>
+        <td><strong>Radio MANET IP táctica (2º Orden PACE):</strong> Órdenes C2 de misión a larga distancia desde el puesto PMP (&ge; 5 km, RCOM-02).</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_rf_uav</code></strong></td>
+        <td><code>uavCenital.rfPortRelay</code></td>
+        <td><code>vehiculo.comunicaciones.rfPortBLOS</code></td>
+        <td><strong>Enlace de relé aéreo (3º Orden PACE):</strong> Si el terreno bloquea la señal directa con el PMP, el dron retransmite la orden al UGV (RCOM-02).</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_bus_comms_control</code></strong></td>
+        <td><code>comunicaciones.dataBus</code></td>
+        <td><code>control.dataBus</code></td>
+        <td><strong>Bus digital interno de a bordo:</strong> Entrega las consignas recibidas por radio limpias al computador para gobernar dirección y motores.</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_comms_frenado_ctrl</code></strong></td>
+        <td><code>comunicaciones.salidaInhabilitacionFrenado</code></td>
+        <td><code>control.entradaInhabilitacionFrenado</code></td>
+        <td><strong>Línea directa de seguridad (5º Orden PACE):</strong> Si se corta la señal por más de 1.000 ms, envía un pulso directo para <strong>clavar los frenos</strong> (RGEN-17).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECCIÓN 2: VISTA 10 -->
+  <h2>2. Vista 10: <code>vistaInternaComunicaciones</code> (Qué hay dentro de la caja)</h2>
+  <p>En esta vista abrimos el subsistema de comunicaciones del UGV para ver sus 5 componentes internos y cómo se cablean a las antenas y al freno.</p>
+
+  <div class="diagram-box">
+ ┌─────────────────────────────────────────────────────────────────────────────┐
+ │ SISTEMA DE COMUNICACIONES EMBARCADO                                         │
+ │                                                                             │
+ │   ┌───────────────┐     c_los                                               │
+ │   │  canal1_LOS   │ ────────────────────────────────────────► [rfPortLOS]   │
+ │   │  (Radio CPT)  │                                                         │
+ │   └───────────────┘                                                         │
+ │                                                                             │
+ │   ┌───────────────┐     c_blos                                              │
+ │   │  canal2_BLOS  │ ──────────────────────────┬─────────────► [rfPortBLOS]  │
+ │   │  (Radio PMP)  │                           │                             │
+ │   └───────────────┘                           │                             │
+ │                                               │ c_uav                       │
+ │   ┌───────────────┐                           │                             │
+ │   │  canal3_UAV   │ ──────────────────────────┘                             │
+ │   │  (Relé Dron)  │                                                         │
+ │   └───────────────┘                                                         │
+ │                                                                             │
+ │   ┌───────────────┐                                                         │
+ │   │  canal4_CNR   │  (Radio VHF 30-88 MHz con vídeo apagado)                │
+ │   │  (Militar)    │                                                         │
+ │   └───────────────┘                                                         │
+ │                                                                             │
+ │   ┌───────────────┐     c_frenado                                           │
+ │   │canal5_Failsafe│ ────────────────────────► [salidaInhabilitacionFrenado]│
+ │   │(Watchdog 1s)  │                                                         │
+ │   └───────────────┘                                                         │
+ └─────────────────────────────────────────────────────────────────────────────┘</div>
+
+  <h3>Partes internas que componen la caja:</h3>
+  <p>Son los <strong>5 canales jerárquicos del Plan PACE</strong>:</p>
+  <div class="part-card">
+    <div class="part-title">1. <code>canal1_LOS</code> (Radio LOS 2.4 GHz)</div>
+    <div class="part-desc">Transceptor de radiofrecuencia de 2.4 GHz para pilotaje cercano con la consola CPT. Protocolo <code>UDP + micro-DDS con FEC</code>, latencia &le; 20 ms y vídeo Full HD 1080p.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">2. <code>canal2_BLOS</code> (Radio MANET BLOS)</div>
+    <div class="part-desc">Transceptor táctico de largo alcance en UHF/Banda C. Protocolo <code>STANAG 4586 / JAUS</code>, alcance &ge; 5 km y vídeo adaptativo.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">3. <code>canal3_UAV</code> (Relé Aéreo con Dron)</div>
+    <div class="part-desc">Electrónica de recepción para recibir el flujo que retransmite el dron en el aire bajo protocolo <code>STANAG 4586</code> con vídeo a 720p.</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">4. <code>canal4_CNR</code> (Radio Militar de Combate en VHF)</div>
+    <div class="part-desc">Radio de combate en VHF (30–88 MHz) con salto de frecuencia FHSS. Salva desfiladeros por difracción terrestre. <strong>Política de vídeo: APAGADO (0 Mbps)</strong> para reservar todo el canal al control (RSW-06).</div>
+  </div>
+  <div class="part-card">
+    <div class="part-title">5. <code>canal5_Failsafe</code> (Watchdog de Frenado de Emergencia)</div>
+    <div class="part-desc">Temporizador de seguridad de 1.000 ms. Si pasan más de 1.000 ms sin recibir señal en ninguno de los canales activos, dispara la parada segura (RGEN-17).</div>
+  </div>
+
+  <h3>Tabla de Conexiones Internas de la Vista 10:</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Conector interno</th>
+        <th>De qué parte sale</th>
+        <th>A qué puerto exterior va</th>
+        <th>¿Qué función realiza?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong><code>c_los</code></strong></td>
+        <td><code>canal1_LOS.rfPort</code></td>
+        <td><code>rfPortLOS</code></td>
+        <td>Conecta la radio de 2.4 GHz con la antena exterior del techo para comunicarse con la consola CPT.</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_blos</code></strong></td>
+        <td><code>canal2_BLOS.rfPort</code></td>
+        <td><code>rfPortBLOS</code></td>
+        <td>Conecta la radio MANET con la antena exterior para comunicarse con el Puesto de Mando PMP.</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_uav</code></strong></td>
+        <td><code>canal3_UAV.rfPort</code></td>
+        <td><code>rfPortBLOS</code></td>
+        <td>Permite que la señal del dron repetidor entre también por el frontal transceptor de largo alcance.</td>
+      </tr>
+      <tr>
+        <td><strong><code>c_frenado</code></strong></td>
+        <td><code>canal5_Failsafe.salidaFreno</code></td>
+        <td><code>salidaInhabilitacionFrenado</code></td>
+        <td>Conecta el perro guardián (*watchdog*) con el puerto exterior que va directo al freno del vehículo.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- RESUMEN FINAL -->
+  <div class="summary-box">
+    <h3>Resumen en 3 Puntos Clave para Explicarlo</h3>
+    <ol>
+      <li><strong>La Vista 9 muestra el exterior:</strong> El UGV en el centro, las 3 estaciones alrededor conectadas por antenas de radio (LOS, BLOS y UAV) y el cable interno que entrega las órdenes al computador y al freno.</li>
+      <li><strong>La Vista 10 muestra el interior:</strong> Los 5 canales de respaldo colocados en orden de fallo (1º LOS &rarr; 2º BLOS &rarr; 3º Dron &rarr; 4º VHF Militar &rarr; 5º Freno).</li>
+      <li><strong>Cómo se relacionan:</strong> Lo que entra por las antenas de la Vista 9 se procesa en los canales de la Vista 10; y si se pierde la señal durante más de 1 segundo, el bloque 5 clava los frenos.</li>
+    </ol>
+  </div>
+
+  <!-- NOTA TÉCNICA: CORRECCIÓN DE CAJAS DUPLICADAS (OPCIÓN A) -->
+  <h2>Nota Técnica de Arquitectura: Corrección de Cajas Duplicadas (Opción A)</h2>
+  <p>Durante las pruebas con la extensión Spec42, se detectó que en algunas vistas globales (como Vista 3 y Vista 4) aparecían repetidas cajas del <code>moduloDeteccionEvasion</code> (hasta 4 veces) y del <code>moduloFrenadoSeguridad</code> (2 a 3 veces).</p>
+  <div class="summary-box" style="border-left-color: #22c55e;">
+    <h3 style="color: #4ade80;">¿Por qué ocurría y cómo se ha solucionado?</h3>
+    <ul>
+      <li><strong>Causa en el motor ELK de Spec42:</strong> Al exponer en la vista el bloque padre completo (<code>PlataformaUGV</code> o <code>SistemaUGVPesadoDual</code>), el algoritmo de proyección de ocurrencias recursivo duplicaba el nodo por cada cable que llegaba a él (canal LiDAR, canal Radar, canal Visión y canal de salida hacia el bus).</li>
+      <li><strong>Solución aplicada (Opción A):</strong> Se ajustó la sentencia <code>expose</code> en <code>Modelos/11_vistas.sysml</code> para proyectar directamente los subsistemas involucrados a nivel de plataforma. De este modo, el motor ELK renderiza exactamente <strong>1 única caja limpia</strong> para <code>moduloDeteccionEvasion</code> y <strong>1 única caja</strong> para <code>moduloFrenadoSeguridad</code>, sin perder ningún conector ni afectar a los requisitos.</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

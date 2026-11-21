@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Presentación: Comunicaciones Tácticas UGV — Pelayo Pache</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #090d16;
+      color: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .deck-container {
+      width: 92vw;
+      max-width: 1080px;
+      height: 82vh;
+      max-height: 670px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 35px 45px;
+      justify-content: space-between;
+    }
+    .slide {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .slide.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 16px;
+    }
+    p.subtitle {
+      font-size: 17px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .grid-pace {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .pace-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pace-card.primary { border-color: #38bdf8; background: rgba(56, 189, 248, 0.08); }
+    .pace-card.danger { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
+    .pace-order { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+    .pace-name { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 6px; }
+    .pace-desc { font-size: 11px; color: #cbd5e1; line-height: 1.3; }
+    .pace-video { font-size: 11px; font-weight: 600; margin-top: 8px; padding: 2px 4px; border-radius: 4px; background: #374151; color: #facc15; }
+    .pace-video.off { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 6px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #1e293b;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border-left: 4px solid #38bdf8;
+    }
+    .feature-item h3 { font-size: 16px; color: #ffffff; margin-bottom: 2px; }
+    .feature-item p { font-size: 13.5px; color: #94a3b8; }
+    
+    /* Estilos del esquema simplificado */
+    .scheme-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+      background: #0d131f;
+      padding: 18px 24px;
+      border-radius: 12px;
+      border: 1px dashed #334155;
+    }
+    .scheme-level {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 16px;
+    }
+    .scheme-box {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      padding: 10px 16px;
+      text-align: center;
+      flex: 1;
+      max-width: 280px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .scheme-box.station {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+    .scheme-box.core {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      max-width: 600px;
+    }
+    .scheme-box.vehicle {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .scheme-box.danger {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.12);
+    }
+    .scheme-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+    .scheme-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .scheme-arrow {
+      text-align: center;
+      color: #38bdf8;
+      font-size: 16px;
+      font-weight: bold;
+      user-select: none;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #1f2937;
+      padding-top: 14px;
+      margin-top: 16px;
+    }
+    .btn {
+      background: #1f2937;
+      color: #f1f5f9;
+      border: 1px solid #374151;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #374151; border-color: #4b5563; }
+    .slide-indicator { font-size: 13px; color: #64748b; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<div class="deck-container">
+  
+  <!-- Diapositiva 1: Portada -->
+  <div class="slide active" id="slide-1">
+    <span class="badge">Robótica / SysML v2</span>
+    <h1>Subsistema de Comunicaciones Tácticas</h1>
+    <p class="subtitle">Arquitectura de Conmutación ante Fallo (Plan PACE) y Vistas del Sistema UGV Pesado Dual.</p>
+    <div style="margin-top: 20px; font-size: 15px; color: #64748b;">
+      <strong>Presentador:</strong> Pelayo Pache Rodríguez<br>
+      <em>Usa las flechas del teclado (&larr; / &rarr;) o los botones para avanzar.</em>
+    </div>
+  </div>
+
+  <!-- Diapositiva 2: El Reto y la Solución -->
+  <div class="slide" id="slide-2">
+    <span class="badge">Concepto Clave</span>
+    <h2>¿Por qué son críticas las comunicaciones?</h2>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div>
+          <h3>1. Vehículo 100% No Tripulado (RGEN-04)</h3>
+          <p>No hay conductor dentro de la barcaza. Todo el movimiento, la visión y la supervivencia dependen del enlace de datos.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>2. La Solución: Cadena de 5 Niveles (Plan PACE)</h3>
+          <p>Si un canal de radio se corta o el terreno lo bloquea, el UGV no se queda colgado: salta automáticamente al siguiente nivel.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>3. Seguridad Failsafe Total (RGEN-17)</h3>
+          <p>Si caen todos los canales y no hay señal en 1.000 ms, el vehículo frena en seco de inmediato.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositiva 3: Los 5 Canales (Plan PACE) -->
+  <div class="slide" id="slide-3">
+    <span class="badge">Plan PACE</span>
+    <h2>La Cadena de Conmutación en 5 Órdenes</h2>
+    <p class="subtitle" style="margin-bottom: 12px;">Secuencia de prioridad si falla el enlace anterior:</p>
+    <div class="grid-pace">
+      <div class="pace-card primary">
+        <div class="pace-order">1º Orden</div>
+        <div class="pace-name">Radio LOS (CPT)</div>
+        <div class="pace-desc">2.4 GHz cercano con la Consola Ligera.<br>Latencia &lt; 20 ms.</div>
+        <div class="pace-video">Vídeo 1080p @ 30 fps</div>
+      </div>
+      <div class="pace-card">
+        <div class="pace-order">2º Orden</div>
+        <div class="pace-name">Radio BLOS (PMP)</div>
+        <div class="pace-desc">MANET IP larga distancia (&ge; 5 km). Mando táctico.</div>
+        <div class="pace-video">Vídeo Adaptativo</div>
+      </div>
+      <div class="pace-card">
+        <div class="pace-order">3º Orden</div>
+        <div class="pace-name">Relé UAV Dron</div>
+        <div class="pace-desc">Si el terreno tapa el haz directo, el dron hace de puente.</div>
+        <div class="pace-video">Vídeo 720p @ 15 fps</div>
+      </div>
+      <div class="pace-card">
+        <div class="pace-order">4º Orden</div>
+        <div class="pace-name">Radio Militar VHF</div>
+        <div class="pace-desc">Canal CNR 30-88 MHz. Respaldo extremo por difracción.</div>
+        <div class="pace-video off">VÍDEO APAGADO (0 Mbps)</div>
+      </div>
+      <div class="pace-card danger">
+        <div class="pace-order">5º Orden</div>
+        <div class="pace-name">Freno Failsafe</div>
+        <div class="pace-desc">Timeout &gt; 1.000 ms sin latido.<br>Bloqueo de tracción.</div>
+        <div class="pace-video off">PARADA TOTAL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositiva 4: ESQUEMA SIMPLIFICADO DE LAS PARTES -->
+  <div class="slide" id="slide-4">
+    <span class="badge">Esquema General</span>
+    <h2>Esquema Simplificado: Partes y Flujo de Comunicaciones</h2>
+    <p class="subtitle" style="margin-bottom: 10px;">Visualización en 3 capas de cómo fluye la información en el UGV:</p>
+    
+    <div class="scheme-wrapper">
+      <!-- Capa 1: Estaciones Externas -->
+      <div class="scheme-level">
+        <div class="scheme-box station">
+          <div class="scheme-title">🎮 Consola CPT (Operador)</div>
+          <div class="scheme-sub">Canal 1: Enlace LOS 2.4 GHz directo</div>
+        </div>
+        <div class="scheme-box station">
+          <div class="scheme-title">🖥️ Puesto de Mando (PMP)</div>
+          <div class="scheme-sub">Canal 2: Enlace BLOS MANET IP (&ge; 5 km)</div>
+        </div>
+        <div class="scheme-box station">
+          <div class="scheme-title">🚁 Dron UAV Cenital</div>
+          <div class="scheme-sub">Canal 3: Repetidor / Relé Aéreo</div>
+        </div>
+      </div>
+
+      <div class="scheme-arrow">&darr; &darr; &darr; Enlaces de Radiofrecuencia (RF) &darr; &darr; &darr;</div>
+
+      <!-- Capa 2: Subsistema de Comunicaciones Embarcado -->
+      <div class="scheme-level">
+        <div class="scheme-box core">
+          <div class="scheme-title" style="color: #34d399; font-size: 15px;">📦 Subsistema de Comunicaciones Embarcado (UGV)</div>
+          <div class="scheme-sub" style="color: #cbd5e1; margin-top: 4px;">
+            <strong>Módulo de Entrada:</strong> 3 Radios + Canal VHF Militar (Canal 4)<br>
+            <strong>Cerebro Central:</strong> Gestor de Conmutación PACE (evalúa señal/latencia) + Cifrado Hardware COMSEC
+          </div>
+        </div>
+      </div>
+
+      <div class="scheme-arrow">&darr; Bus Digital Interno &darr; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &darr; Línea Directa de Seguridad &darr;</div>
+
+      <!-- Capa 3: A dónde va en la Plataforma -->
+      <div class="scheme-level">
+        <div class="scheme-box vehicle">
+          <div class="scheme-title">🧠 Computador de Control (GNC)</div>
+          <div class="scheme-sub">Recibe consignas de volante, gas y waypoints</div>
+        </div>
+        <div class="scheme-box danger">
+          <div class="scheme-title">🛑 Módulo Frenado Failsafe</div>
+          <div class="scheme-sub">Si no hay latido en 1.000 ms, clava frenos (RGEN-17)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositiva 5: Vista 9 (Conexiones Externas) -->
+  <div class="slide" id="slide-5">
+    <span class="badge">Modelo SysML v2</span>
+    <h2>Vista 9: vistaConexionesComunicaciones</h2>
+    <p class="subtitle" style="margin-bottom: 16px;">Muestra cómo se conecta el UGV con las estaciones de control externas:</p>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div>
+          <h3>Estaciones Externas Representadas</h3>
+          <p>Consola Ligera CPT (desmontada), Puesto de Mando PMP (remoto) y UAV Cenital (dron en techo).</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>Enlaces de RF Tácticos</h3>
+          <p><code>c_rf_los</code> (hacia CPT), <code>c_rf_blos</code> (hacia PMP) y <code>c_rf_uav</code> (hacia el transpondedor del dron).</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>Conexión con el Control del Vehículo</h3>
+          <p>Bus digital de a bordo (<code>c_bus_comms_control</code>) y cable prioritario de frenado automático (<code>c_comms_frenado_ctrl</code>).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositiva 6: Vista 10 (Arquitectura Interna) -->
+  <div class="slide" id="slide-6">
+    <span class="badge">Modelo SysML v2</span>
+    <h2>Vista 10: vistaInternaComunicaciones</h2>
+    <p class="subtitle" style="margin-bottom: 16px;">Muestra los 5 bloques funcionales dentro del subsistema embarcado:</p>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div>
+          <h3>1. Estructura Limpia sin Cables Sobrecargados</h3>
+          <p>Cada uno de los 5 canales PACE modelado como una parte específica (<code>canal1_LOS</code> a <code>canal5_Failsafe</code>).</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>2. Conexiones a Puertos de Contorno</h3>
+          <p>Enlaces directos a los puertos externos de RF (LOS y BLOS) y salida directa de frenado hacia GNC.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>3. Cero Errores y Avisos en Spec42</h3>
+          <p>Validado con <code>spec42 check Modelos</code> (0 errores, 0 avisos) y renderizado perfecto en diagramas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diapositiva 7: Conclusiones -->
+  <div class="slide" id="slide-7">
+    <span class="badge">Conclusiones</span>
+    <h2>Resumen para el Equipo</h2>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div>
+          <h3>Simple, Robusto y Trazable</h3>
+          <p>Cumple estrictamente los requisitos del pliego: <strong>RCOM-01</strong> (LOS), <strong>RCOM-02</strong> (BLOS/UAV), <strong>RCOM-03</strong> (COMSEC), <strong>RSW-06</strong> (PACE/QoS) y <strong>RGEN-17</strong> (Failsafe).</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div>
+          <h3>Fácil de Leer y Extender</h3>
+          <p>Menos de 100 líneas en <code>05_comunicaciones.sysml</code>. Cualquier miembro del equipo puede ver y entender los 5 canales inmediatamente.</p>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top: 20px; color: #38bdf8; font-weight: 600;">¿Preguntas o comentarios?</p>
+  </div>
+
+  <!-- Barra de Controles Inferior -->
+  <div class="controls">
+    <button class="btn" onclick="prevSlide()">&larr; Anterior</button>
+    <span class="slide-indicator" id="indicator">Diapositiva 1 de 7</span>
+    <button class="btn" onclick="nextSlide()">Siguiente &rarr;</button>
+  </div>
+
+</div>
+
+<script>
+  let currentSlide = 1;
+  const totalSlides = 7;
+
+  function showSlide(index) {
+    if (index < 1) index = 1;
+    if (index > totalSlides) index = totalSlides;
+    currentSlide = index;
+
+    for (let i = 1; i <= totalSlides; i++) {
+      const el = document.getElementById(`slide-${i}`);
+      if (el) el.classList.toggle('active', i === currentSlide);
+    }
+    document.getElementById('indicator').innerText = `Diapositiva ${currentSlide} de ${totalSlides}`;
+  }
+
+  function nextSlide() { showSlide(currentSlide + 1); }
+  function prevSlide() { showSlide(currentSlide - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Explicación del Subsistema de Comunicaciones y sus Vistas — UGV Pesado Dual</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #0f172a;
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 12px;
+      margin-top: 0;
+      font-size: 26px;
+    }
+    h2 {
+      color: #0369a1;
+      margin-top: 32px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+      font-size: 20px;
+    }
+    h3 {
+      color: #0f172a;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+    }
+    .card-title {
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    .highlight {
+      background-color: #fef08a;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+    }
+    @media print {
+      body { background-color: #ffffff; padding: 0; }
+      .container { box-shadow: none; padding: 0; max-width: 100%; }
+      h2 { page-break-after: avoid; }
+      .card { page-break-inside: avoid; }
+      table { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <span class="badge">Robótica / SysML v2</span>
+  <h1>Explicación del Subsistema de Comunicaciones y sus Vistas</h1>
+  <p><strong>Autor:</strong> Pelayo Pache Rodríguez | <strong>Sistema:</strong> UGV Pesado Dual de Combate</p>
+
+  <p>Este documento explica de forma clara, directa y estructurada cómo está concebido el subsistema de comunicaciones del UGV y el contenido exacto de las vistas modeladas en SysML v2.</p>
+
+  <h2>1. ¿Cómo funcionan las comunicaciones en reglas generales?</h2>
+  <p>Al ser un vehículo no tripulado pesado, el UGV no tiene conductor a bordo. La disponibilidad del enlace es crítica: si se pierde la comunicación, el vehículo no puede quedar descontrolado. Por ello, el subsistema se rige por una única <strong>regla de oro: la cadena de conmutación ante fallos (Plan PACE)</strong>.</p>
+  <p>Existen <strong>5 niveles jerárquicos</strong>. El sistema siempre intenta operar en el nivel 1 (el más rápido y con mejor vídeo). Si ese nivel se pierde o degrada, salta automáticamente al siguiente:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nivel</th>
+        <th>Canal / Protocolo</th>
+        <th>¿Cuándo se usa?</th>
+        <th>Comportamiento del Vídeo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1º ORDEN</strong><br>(Principal)</td>
+        <td><strong>Radio LOS 2.4 GHz</strong><br><code>UDP + micro-DDS con FEC</code><br>(Latencia &lt; 20 ms)</td>
+        <td>Pilotaje cercano en línea de vista con la <strong>Consola CPT</strong> (desmontada). Alcance nominal hasta 1,5 km (RCOM-01).</td>
+        <td>Vídeo diurno/térmico 1080p @ 30 fps activo en la pantalla de la consola.</td>
+      </tr>
+      <tr>
+        <td><strong>2º ORDEN</strong><br>(Alternativo)</td>
+        <td><strong>Radio MANET BLOS</strong><br><code>STANAG 4586 / JAUS</code><br>(Latencia &lt; 150 ms)</td>
+        <td>Operación a larga distancia desde el <strong>Puesto de Mando PMP</strong> sin visión directa (&ge; 5 km).</td>
+        <td>Vídeo 1080p adaptativo según calidad de radio.</td>
+      </tr>
+      <tr>
+        <td><strong>3º ORDEN</strong><br>(Contingencia)</td>
+        <td><strong>Relé Aéreo con UAV</strong><br><code>STANAG 4586</code> sobre dron cenital</td>
+        <td>Si el terreno o desfiladeros cortan el haz directo con el PMP, el dron del techo hace de repetidor aéreo (RCOM-02).</td>
+        <td>Vídeo comprimido a 720p @ 15 fps para no saturar el enlace del dron.</td>
+      </tr>
+      <tr>
+        <td><strong>4º ORDEN</strong><br>(Respaldo Militar)</td>
+        <td><strong>Radio Militar CNR VHF</strong><br><code>BMS-ET / C2</code> (30–88 MHz con salto FHSS)</td>
+        <td>Entorno hostil, guerra electrónica o pérdida de las radios de banda ancha. Gran alcance por difracción.</td>
+        <td><strong>VÍDEO 100% APAGADO</strong>. Todo el canal se reserva exclusivamente a las órdenes de movimiento y freno (RSW-06).</td>
+      </tr>
+      <tr>
+        <td><strong>5º ORDEN</strong><br>(Failsafe Crítico)</td>
+        <td><strong>Frenado de Emergencia</strong><br>Timeout de latido &gt; 1.000 ms</td>
+        <td>Si se cortan todos los canales y pasan más de 1.000 ms sin señal, se activa el freno automático de seguridad (RGEN-17).</td>
+        <td>Vehículo detenido y bloqueado en retención activa hasta recuperar enlace válido.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Esquema Conceptual en 3 Capas de las Partes de Comunicaciones</h2>
+  <p>Para entender las partes del subsistema sin la complejidad de los conectores SysML v2, la arquitectura se divide en <strong>tres niveles funcionales</strong>:</p>
+
+  <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px; margin: 16px 0;">
+    <div style="text-align: center; margin-bottom: 12px;">
+      <strong style="color: #0369a1; font-size: 13px; text-transform: uppercase;">[ Capa 1: Estaciones Externas ]</strong><br>
+      <div style="display: flex; justify-content: space-around; gap: 10px; margin-top: 8px;">
+        <span style="background: #ffffff; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 13px;">🎮 Consola CPT (2.4 GHz)</span>
+        <span style="background: #ffffff; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 13px;">🖥️ Puesto PMP (MANET IP)</span>
+        <span style="background: #ffffff; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 13px;">🚁 Dron Relé UAV</span>
+      </div>
+    </div>
+
+    <div style="text-align: center; color: #0284c7; font-weight: bold; margin: 8px 0;">&darr; &darr; Enlaces de Radiofrecuencia (RF) &darr; &darr;</div>
+
+    <div style="background: #ffffff; border: 2px solid #0284c7; border-radius: 8px; padding: 14px; text-align: center; margin: 8px auto; max-width: 600px;">
+      <strong style="color: #0f172a; font-size: 15px;">📦 Subsistema de Comunicaciones Embarcado (UGV)</strong>
+      <div style="font-size: 13px; color: #475569; margin-top: 6px; line-height: 1.5;">
+        <strong>Transceptores de Entrada:</strong> Radio LOS + Radio BLOS + Radio Militar VHF (con salto FHSS)<br>
+        <strong>Núcleo de Gestión:</strong> Gestor de Conmutación PACE (conmuta ante fallo) + Criptoprocesador COMSEC
+      </div>
+    </div>
+
+    <div style="text-align: center; color: #0284c7; font-weight: bold; margin: 8px 0;">&darr; Bus Digital (GNC) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &darr; Línea Directa de Seguridad</div>
+
+    <div style="text-align: center;">
+      <strong style="color: #b45309; font-size: 13px; text-transform: uppercase;">[ Capa 3: Actuadores del Vehículo ]</strong><br>
+      <div style="display: flex; justify-content: space-around; gap: 10px; margin-top: 8px;">
+        <span style="background: #ffffff; border: 1px solid #f59e0b; padding: 6px 12px; border-radius: 6px; font-size: 13px;">🧠 Computador de Control (GNC)</span>
+        <span style="background: #ffffff; border: 1px solid #ef4444; padding: 6px 12px; border-radius: 6px; font-size: 13px; color: #b91c1c;">🛑 Módulo Frenado de Emergencia</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>3. Explicación de la Vista 9: <code>vistaConexionesComunicaciones</code></h2>
+  <div class="card">
+    <div class="card-title">Propósito de la Vista 9 (IBD de Frontera / Sistema Completo)</div>
+    <p>Esta vista responde a la pregunta: <strong>¿Con qué se comunica el UGV desde el exterior?</strong></p>
+    <ul>
+      <li><strong>Estaciones Externas:</strong> Muestra el <em>Puesto de Mando Portable (PMP)</em>, la <em>Consola Portable de Operador (CPT)</em> y el <em>UAV Cenital</em>.</li>
+      <li><strong>Enlaces de Radiofrecuencia (RF):</strong>
+        <ul>
+          <li><code>c_rf_los</code>: Enlace directo entre la Consola CPT y el UGV (1º Orden).</li>
+          <li><code>c_rf_blos</code>: Enlace directo entre el Puesto PMP y el UGV (2º Orden).</li>
+          <li><code>c_rf_uav</code>: Enlace de contingencia entre el UGV y el dron relé (3º Orden).</li>
+        </ul>
+      </li>
+      <li><strong>Conexión con el Control del Vehículo:</strong> Muestra el enlace interno entre el bloque de comunicaciones y el computador de control (<code>c_bus_comms_control</code>) y la línea prioritaria de frenado de seguridad (<code>c_comms_frenado_ctrl</code>).</li>
+    </ul>
+    <p><em>Nota de simplificación:</em> Se eliminaron los cables secundarios de cámaras y sensores auxiliares para que el diagrama de Spec42 sea claro, limpio y fácil de explicar a primera vista.</p>
+  </div>
+
+  <h2>4. Explicación de la Vista 10: <code>vistaInternaComunicaciones</code></h2>
+  <div class="card">
+    <div class="card-title">Propósito de la Vista 10 (Arquitectura Interna del Subsistema)</div>
+    <p>Esta vista responde a la pregunta: <strong>¿Qué hay dentro de la caja de comunicaciones del UGV?</strong></p>
+    <ul>
+      <li>Expone directamente los <strong>5 bloques que ejecutan el Plan PACE</strong>:
+        <ol>
+          <li><code>canal1_LOS</code> (Radio LOS 2.4 GHz)</li>
+          <li><code>canal2_BLOS</code> (Radio MANET BLOS)</li>
+          <li><code>canal3_UAV</code> (Relé Aéreo con Dron)</li>
+          <li><code>canal4_CNR</code> (Radio Militar VHF con corte de vídeo)</li>
+          <li><code>canal5_Failsafe</code> (Watchdog de disparo de parada)</li>
+        </ol>
+      </li>
+      <li>Muestra las conexiones directas a los puertos externos de radiofrecuencia (<code>rfPortLOS</code>, <code>rfPortBLOS</code>) y a la salida de frenado (<code>salidaInhabilitacionFrenado</code>).</li>
+    </ul>
+  </div>
+
+  <h2>5. Trazabilidad con los Requisitos del Pliego</h2>
+  <p>El modelo satisface formalmente y de forma limpia los requisitos contractuales:</p>
+  <ul>
+    <li><strong>RCOM-01</strong> (<code>ReqEnlaceLOS</code>): Enlace de telemando suave con la CPT en línea de vista (latencia &le; 100 ms).</li>
+    <li><strong>RCOM-02</strong> (<code>ReqEnlaceBLOS</code>): Mando a distancia desde PMP (&ge; 5 km) y compatibilidad de relé aéreo con el UAV.</li>
+    <li><strong>RCOM-03</strong> (<code>ReqSeguridadCOMSEC</code>): Cifrado militar hardware (AES-256) y protección anti-jamming.</li>
+    <li><strong>RSW-06</strong> (<code>ReqProtocolosPACE</code>): Priorización estricta de paquetes de control frente a vídeo.</li>
+    <li><strong>RGEN-17</strong> (<code>ReqFailsafeEnlace</code>): Parada de seguridad automática ante pérdida de señal (&gt; 1.000 ms).</li>
+  </ul>
+
+  <div class="footer">
+    Proyecto UGV Pesado Dual — Grado en Ingeniería Robótica | Modelado en SysML v2 y validado con Spec42
+  </div>
+</div>
+
+</body>
+</html>
