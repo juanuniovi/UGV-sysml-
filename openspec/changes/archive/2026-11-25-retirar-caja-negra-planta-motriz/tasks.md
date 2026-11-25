@@ -36,3 +36,4 @@
 - `spec42 check Modelos` (elan8.spec42 0.61.1, binario de la extensión): `Checked 14 document(s): 0 error(s), 0 warning(s), 0 info(s)`.
 - `spec42 diagram Modelos`: las mismas 12 vistas que en la línea base. Las 12 se renderizan y su salida es **idéntica** a la línea base anterior al cambio.
 - Ninguna referencia a `CajaNegraPlantaMotriz` ni a `PlantaMotrizCajaNegra` fuera del archivo, ni en local ni en `origin/main` (`9f71e72`).
+- Archivo: `openspec archive` rechazó al principio dejar una especificación sin requisitos. Siguiendo la indicación del propio CLI, se añadió `retire_capabilities: true` a `.openspec.yaml` y el archivo retiró `openspec/specs/planta-motriz-caja-negra/` (10 requisitos eliminados). No hizo falta borrarla a mano (decisión D2). `openspec validate --all`: 13 correctos y 0 fallidos.
