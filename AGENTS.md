@@ -41,6 +41,24 @@ Si una petición modifica, elimina, relaja, sustituye o contradice un requisito 
 
 No interpretes la petición de añadir un componente o requisito como autorización para alterar requisitos vigentes.
 
+## Coordinación entre responsables de subsistema
+
+Cada archivo de `Modelos/` y su especificación en `openspec/specs/` tienen un responsable: la persona asignada en GitHub al *issue* de ese subsistema. Si no hay *issue* o la asignación no es clara, pregunta al usuario.
+
+1. No edites archivos cuyo responsable no sea el usuario con el que trabajas, aunque el cambio parezca pequeño o evidente. Quien lleva el subsistema es quien conoce su diseño y debe decidir cómo se resuelve.
+2. Si tu tarea necesita un cambio en un archivo ajeno, detente y redacta un *issue* dirigido a su responsable que indique:
+   - qué se necesita (dato, puerto, atributo, corrección…) y en qué archivo;
+   - por qué se necesita y qué subsistema lo requiere;
+   - los requisitos del pliego implicados (`RGEN`, `RLT1`, `ROPE`, `RCOM`, `RNAV`) o, si es un valor propio, que es un requisito derivado de diseño interno;
+   - opcionalmente, una sugerencia de solución, dejando claro que la decisión es del responsable.
+3. No publiques el *issue* sin la confirmación del usuario.
+4. Mientras el *issue* esté abierto, registra la dependencia en `proposal.md` (con su número) y deja fuera de `tasks.md` cualquier tarea sobre el archivo ajeno.
+5. Los archivos compartidos (`00_tipos_base.sysml`, `09_sistema_ugv.sysml`, `10_comportamiento.sysml`, la cabecera de `11_vistas.sysml`, `AGENTS.md` y `openspec/config.yaml`) siguen el mismo criterio: se proponen por *issue* y no se modifican sin el acuerdo de sus responsables o del equipo.
+
+Excepciones:
+- Cada responsable puede editar y añadir sus propias vistas en `11_vistas.sysml`, usando nombres cualificados en `expose` en lugar de añadir `import` a la cabecera compartida.
+- Si el responsable autoriza por escrito en el *issue* que otra persona haga el cambio, puede hacerse; registra esa autorización (enlace al *issue*) en `proposal.md`.
+
 ## Acceso a documentos densos y pliegos de referencia
 
 Los documentos PDF oficiales ubicados en `docs/` (`ROBOT_TERRESTRE_Contrato.pdf` y `ROBOT_TERRESTRE_Anexo_I.pdf`) contienen pliegos y especificaciones contractuales muy extensas. Para preservar el contexto y evitar consumo innecesario de tokens:
