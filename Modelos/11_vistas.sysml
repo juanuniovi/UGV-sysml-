@@ -65,7 +65,7 @@ package VistasUGV {
 
     // Vista 7: Estructura conjunta de los Subsistemas 4.1 Control y 4.2 Navegación (equivalente a BDD)
     view vistaEstructuraNavegacionControl : GeneralView {
-        doc /* Muestra conjuntamente las dos partes (control y navegacion) con sus bloques internos (computador de autonomía y sus tres subsistemas ROS 2, frenado, subpartes camaras y sensores con LiDAR, radar, transductores de rodaje, cámaras 360 con profundidad, cámaras laterales y térmica de puntos calientes, visión por computador, detección/evasión y odometría VIO), subsistema de iluminacion 360, sus puertos y conexiones (RGEN-09, RNAV-01, ROPE-05, ROPE-06, RGEN-17, RGEN-20, RGEN-22) */
+        doc /* Muestra conjuntamente las dos partes (control y navegacion) con sus bloques internos (computador de autonomía y sus tres subsistemas ROS 2, frenado, subpartes camaras y sensores con LiDAR, radar, transductores de rodaje, cámaras 360 con profundidad, cámaras laterales y térmica de puntos calientes, detección/evasión y odometría VIO), subsistema de iluminacion 360, sus puertos y conexiones (RGEN-09, RNAV-01, ROPE-05, ROPE-06, RGEN-17, RGEN-20, RGEN-22) */
         expose SistemaUGV::PlataformaUGV::control;
         expose SistemaUGV::PlataformaUGV::navegacion;
         expose SistemaUGV::PlataformaUGV::iluminacion;

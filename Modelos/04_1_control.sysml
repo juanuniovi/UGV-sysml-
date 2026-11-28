@@ -68,7 +68,7 @@ package SubsistemaControl {
 
     // --- Subsistemas Internos del Computador de Autonomia en ROS 2 ---
     part def SubsistemaFusionEstado {
-        doc /* Recibe los items de percepcion (LiDAR, Radar, Vision) y Odometria para generar el mapa y estado unificado en ROS 2 */
+        doc /* Recibe los items de percepcion (LiDAR, Radar, Camaras) y Odometria para generar el mapa y estado unificado en ROS 2 */
         port entradaObstaculos : ~PuertoMapaObstaculos;
         port entradaOdometria : ~PuertoOdometriaVIO;
         port salidaMapaUnificado : PuertoMapaEstadoUnificado;
